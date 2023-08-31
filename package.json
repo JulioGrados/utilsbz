@@ -1,0 +1,30 @@
+{
+  "name": "utils",
+  "version": "1.0.0",
+  "description": "Funciones globales",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://julio_giampiere_grados@bitbucket.org/devcodela/utilsbz.git"
+  },
+  "author": "bizeus",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://bitbucket.org/devcodela/utilsbz/issues"
+  },
+  "homepage": "https://bitbucket.org/devcodela/utilsbz#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bcryptjs": "^2.4.3",
+    "chalk": "^3.0.0",
+    "js-cookie": "^2.2.1",
+    "moment": "^2.29.3",
+    "config": "../config"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1"
+  }
+}
