@@ -1,7 +1,6 @@
 'use strict'
 
 const parseErrorDB = err => {
-  console.log(err)
   let message = '!Ups ocurrio un error en el servidor¡'
   let status = 500
   if (err) {
