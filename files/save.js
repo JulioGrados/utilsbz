@@ -4,7 +4,7 @@ const download = require('download')
 
 let SERVER_PATH
 if (config.media.env === 'production') {
-  SERVER_PATH = '/opt/mediabz/uploads'
+  SERVER_PATH = config.media.productionUrl + '/uploads'
 } else {
   SERVER_PATH = path.join(__dirname, '../../mediabz/uploads')
 }
