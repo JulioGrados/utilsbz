@@ -71,7 +71,7 @@ const saveImage = async (binary, name) => {
         data: data,
       });
 
-      return 'images/' + name + '.png'; // Nombre del archivo
+      return '/images/' + name + '.png'; // Nombre del archivo
     } catch (error) {
       console.error('Error al subir el archivo:', error);
 
