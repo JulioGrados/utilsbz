@@ -1,7 +1,7 @@
 const { post } = require('../lib/request')
 
-const login = (username, password) => {
-  return post('/open/auth/login', { username, password })
+const login = (email, password) => {
+  return post('/open/auth/login', { email, password })
 }
 
 module.exports = {
