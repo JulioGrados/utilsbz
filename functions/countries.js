@@ -1,1706 +1,482 @@
-const countries = [
+const countriesData = [
+  { name: "Afghanistan", callingCode: "93", code: "AF", flag: "🇦🇫" },
+  { name: "Åland Islands", callingCode: "358", code: "AX", flag: "🇦🇽" },
+  { name: "Albania", callingCode: "355", code: "AL", flag: "🇦🇱" },
+  { name: "Algeria", callingCode: "213", code: "DZ", flag: "🇩🇿" },
   {
-    name_en: "Afghanistan",
-    name_es: "Afganistán",
-    dial_code: "93",
-    code: "AF",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Albania",
-    name_es: "Albania",
-    dial_code: "355",
-    code: "AL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Algeria",
-    name_es: "Argelia",
-    dial_code: "213",
-    code: "DZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "AmericanSamoa",
-    name_es: "Samoa Americana",
-    dial_code: "1684",
+    name: "American Samoa",
+    callingCode: "1684",
     code: "AS",
-    currency: 'PEN'
+    flag: "🇦🇸",
   },
+  { name: "Andorra", callingCode: "376", code: "AD", flag: "🇦🇩" },
+  { name: "Angola", callingCode: "244", code: "AO", flag: "🇦🇴" },
+  { name: "Anguilla", callingCode: "1264", code: "AI", flag: "🇦🇮" },
+  { name: "Antarctica", callingCode: "672", code: "AQ", flag: "🇦🇶" },
   {
-    name_en: "Andorra",
-    name_es: "Andorra",
-    dial_code: "376",
-    code: "AD",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Angola",
-    name_es: "Angola",
-    dial_code: "244",
-    code: "AO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Anguilla",
-    name_es: "Anguilla",
-    dial_code: "1264",
-    code: "AI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Antarctica",
-    name_es: "Antártida",
-    dial_code: "672",
-    code: "AQ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Antigua and Barbuda",
-    name_es: "Antigua y Barbuda",
-    dial_code: "1268",
+    name: "Antigua and Barbuda",
+    callingCode: "1268",
     code: "AG",
-    currency: 'PEN'
+    flag: "🇦🇬",
   },
+  { name: "Argentina", callingCode: "54", code: "AR", flag: "🇦🇷" },
+  { name: "Armenia", callingCode: "374", code: "AM", flag: "🇦🇲" },
+  { name: "Aruba", callingCode: "297", code: "AW", flag: "🇦🇼" },
+  { name: "Australia", callingCode: "61", code: "AU", flag: "🇦🇺" },
+  { name: "Austria", callingCode: "43", code: "AT", flag: "🇦🇹" },
+  { name: "Azerbaijan", callingCode: "994", code: "AZ", flag: "🇦🇿" },
+  { name: "Bahamas", callingCode: "1242", code: "BS", flag: "🇧🇸" },
+  { name: "Bahrain", callingCode: "973", code: "BH", flag: "🇧🇭" },
+  { name: "Bangladesh", callingCode: "880", code: "BD", flag: "🇧🇩" },
+  { name: "Barbados", callingCode: "1246", code: "BB", flag: "🇧🇧" },
+  { name: "Belarus", callingCode: "375", code: "BY", flag: "🇧🇾" },
+  { name: "Belgium", callingCode: "32", code: "BE", flag: "🇧🇪" },
+  { name: "Belize", callingCode: "501", code: "BZ", flag: "🇧🇿" },
+  { name: "Benin", callingCode: "229", code: "BJ", flag: "🇧🇯" },
+  { name: "Bermuda", callingCode: "1441", code: "BM", flag: "🇧🇲" },
+  { name: "Bhutan", callingCode: "975", code: "BT", flag: "🇧🇹" },
   {
-    name_en: "Argentina",
-    name_es: "Argentina",
-    dial_code: "54",
-    code: "AR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Armenia",
-    name_es: "Armenia",
-    dial_code: "374",
-    code: "AM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Aruba",
-    name_es: "Aruba",
-    dial_code: "297",
-    code: "AW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Australia",
-    name_es: "Australia",
-    dial_code: "61",
-    code: "AU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Austria",
-    name_es: "Austria",
-    dial_code: "43",
-    code: "AT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Azerbaijan",
-    name_es: "Azerbaiyán",
-    dial_code: "994",
-    code: "AZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Bahamas",
-    name_es: "Bahamas",
-    dial_code: "1242",
-    code: "BS",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Bahrain",
-    name_es: "Baréin",
-    dial_code: "973",
-    code: "BH",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Bangladesh",
-    name_es: "Banglades",
-    dial_code: "880",
-    code: "BD",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Barbados",
-    name_es: "Barbados",
-    dial_code: "1246",
-    code: "BB",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Belarus",
-    name_es: "Bielorrusia",
-    dial_code: "375",
-    code: "BY",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Belgium",
-    name_es: "Bélgica",
-    dial_code: "32",
-    code: "BE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Belize",
-    name_es: "Belice",
-    dial_code: "501",
-    code: "BZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Benin",
-    name_es: "Benin",
-    dial_code: "229",
-    code: "BJ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Bermuda",
-    name_es: "Bermudas",
-    dial_code: "1441",
-    code: "BM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Bhutan",
-    name_es: "Butan",
-    dial_code: "975",
-    code: "BT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Bolivia",
-    name_es: "Bolivia",
-    dial_code: "591",
+    name: "Bolivia, Plurinational State of bolivia",
+    callingCode: "591",
     code: "BO",
-    currency: 'PEN'
+    flag: "🇧🇴",
   },
   {
-    name_en: "Bosnia and Herzegovina",
-    name_es: "Bosnia-Herzegovina",
-    dial_code: "387",
+    name: "Bosnia and Herzegovina",
+    callingCode: "387",
     code: "BA",
-    currency: 'PEN'
+    flag: "🇧🇦",
   },
+  { name: "Botswana", callingCode: "267", code: "BW", flag: "🇧🇼" },
+  { name: "Bouvet Island", callingCode: "47", code: "BV", flag: "🏳" },
+  { name: "Brazil", callingCode: "55", code: "BR", flag: "🇧🇷" },
   {
-    name_en: "Botswana",
-    name_es: "Botsuana",
-    dial_code: "267",
-    code: "BW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Brazil",
-    name_es: "Brasil",
-    dial_code: "55",
-    code: "BR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "British Indian Ocean Territory",
-    name_es: "Territorio Británico del Océano Índico",
-    dial_code: "246",
+    name: "British Indian Ocean Territory",
+    callingCode: "246",
     code: "IO",
-    currency: 'PEN'
+    flag: "🇮🇴",
   },
   {
-    name_en: "Brunei Darussalam",
-    name_es: "Brunei",
-    dial_code: "673",
+    name: "Brunei Darussalam",
+    callingCode: "673",
     code: "BN",
-    currency: 'PEN'
+    flag: "🇧🇳",
   },
+  { name: "Bulgaria", callingCode: "359", code: "BG", flag: "🇧🇬" },
+  { name: "Burkina Faso", callingCode: "226", code: "BF", flag: "🇧🇫" },
+  { name: "Burundi", callingCode: "257", code: "BI", flag: "🇧🇮" },
+  { name: "Cambodia", callingCode: "855", code: "KH", flag: "🇰🇭" },
+  { name: "Cameroon", callingCode: "237", code: "CM", flag: "🇨🇲" },
+  { name: "Canada", callingCode: "1", code: "CA", flag: "🇨🇦" },
+  { name: "Cape Verde", callingCode: "238", code: "CV", flag: "🇨🇻" },
   {
-    name_en: "Bulgaria",
-    name_es: "Bulgaria",
-    dial_code: "359",
-    code: "BG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Burkina Faso",
-    name_es: "Burkina Faso",
-    dial_code: "226",
-    code: "BF",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Burundi",
-    name_es: "Burundi",
-    dial_code: "257",
-    code: "BI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Cambodia",
-    name_es: "Camboya",
-    dial_code: "855",
-    code: "KH",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Cameroon",
-    name_es: "Camerún",
-    dial_code: "237",
-    code: "CM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Canada",
-    name_es: "Canadá",
-    dial_code: "1",
-    code: "CA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Cape Verde",
-    name_es: "Cabo Verde",
-    dial_code: "238",
-    code: "CV",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Cayman Islands",
-    name_es: "Islas Caimán",
-    dial_code: " 345",
+    name: "Cayman Islands",
+    callingCode: " 345",
     code: "KY",
-    currency: 'PEN'
+    flag: "🇰🇾",
   },
   {
-    name_en: "Central African Republic",
-    name_es: "República Centroafricana",
-    dial_code: "236",
+    name: "Central African Republic",
+    callingCode: "236",
     code: "CF",
-    currency: 'PEN'
+    flag: "🇨🇫",
   },
+  { name: "Chad", callingCode: "235", code: "TD", flag: "🇹🇩" },
+  { name: "Chile", callingCode: "56", code: "CL", flag: "🇨🇱" },
+  { name: "China", callingCode: "86", code: "CN", flag: "🇨🇳" },
   {
-    name_en: "Chad",
-    name_es: "Chad",
-    dial_code: "235",
-    code: "TD",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Chile",
-    name_es: "Chile",
-    dial_code: "56",
-    code: "CL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "China",
-    name_es: "China",
-    dial_code: "86",
-    code: "CN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Christmas Island",
-    name_es: "Isla de Navidad",
-    dial_code: "61",
+    name: "Christmas Island",
+    callingCode: "61",
     code: "CX",
-    currency: 'PEN'
+    flag: "🇨🇽",
   },
   {
-    name_en: "Cocos (Keeling) Islands",
-    name_es: "Islas Cocos",
-    dial_code: "61",
+    name: "Cocos (Keeling) Islands",
+    callingCode: "61",
     code: "CC",
-    currency: 'PEN'
+    flag: "🇨🇨",
   },
+  { name: "Colombia", callingCode: "57", code: "CO", flag: "🇨🇴" },
+  { name: "Comoros", callingCode: "269", code: "KM", flag: "🇰🇲" },
+  { name: "Congo", callingCode: "242", code: "CG", flag: "🇨🇬" },
   {
-    name_en: "Colombia",
-    name_es: "Colombia",
-    dial_code: "57",
-    code: "CO",
-    currency: 'COP'
-  },
-  {
-    name_en: "Comoros",
-    name_es: "Comoras",
-    dial_code: "269",
-    code: "KM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Congo",
-    name_es: "Congo",
-    dial_code: "242",
-    code: "CG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Congo, The Democratic Republic of the",
-    name_es: "República Democrática del Congo",
-    dial_code: "243",
+    name: "Congo, The Democratic Republic of the Congo",
+    callingCode: "243",
     code: "CD",
-    currency: 'PEN'
+    flag: "🇨🇩",
   },
+  { name: "Cook Islands", callingCode: "682", code: "CK", flag: "🇨🇰" },
+  { name: "Costa Rica", callingCode: "506", code: "CR", flag: "🇨🇷" },
+  { name: "Cote d'Ivoire", callingCode: "225", code: "CI", flag: "🇨🇮" },
+  { name: "Croatia", callingCode: "385", code: "HR", flag: "🇭🇷" },
+  { name: "Cuba", callingCode: "53", code: "CU", flag: "🇨🇺" },
+  { name: "Cyprus", callingCode: "357", code: "CY", flag: "🇨🇾" },
+  { name: "Czech Republic", callingCode: "420", code: "CZ", flag: "🇨🇿" },
+  { name: "Denmark", callingCode: "45", code: "DK", flag: "🇩🇰" },
+  { name: "Djibouti", callingCode: "253", code: "DJ", flag: "🇩🇯" },
+  { name: "Dominica", callingCode: "1767", code: "DM", flag: "🇩🇲" },
   {
-    name_en: "Cook Islands",
-    name_es: "Islas Cook",
-    dial_code: "682",
-    code: "CK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Costa Rica",
-    name_es: "Costa Rica",
-    dial_code: "506",
-    code: "CR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Cote d'Ivoire",
-    name_es: "Costa de Marfil",
-    dial_code: "225",
-    code: "CI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Croatia",
-    name_es: "Croacia",
-    dial_code: "385",
-    code: "HR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Cuba",
-    name_es: "Cuba",
-    dial_code: "53",
-    code: "CU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Cyprus",
-    name_es: "Chipre",
-    dial_code: "537",
-    code: "CY",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Czechia",
-    name_es: "Chequia",
-    dial_code: "420",
-    code: "CZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Denmark",
-    name_es: "Dinamarca",
-    dial_code: "45",
-    code: "DK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Djibouti",
-    name_es: "Yibuti",
-    dial_code: "253",
-    code: "DJ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Dominica",
-    name_es: "Dominica",
-    dial_code: "1767",
-    code: "DM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Dominican Republic",
-    name_es: "República Dominicana",
-    dial_code: "1849",
+    name: "Dominican Republic",
+    callingCode: "1849",
     code: "DO",
-    currency: 'PEN'
+    flag: "🇨🇩",
   },
+  { name: "Ecuador", callingCode: "593", code: "EC", flag: "🇪🇨" },
+  { name: "Egypt", callingCode: "20", code: "EG", flag: "🇪🇬" },
+  { name: "El Salvador", callingCode: "503", code: "SV", flag: "🇸🇻" },
   {
-    name_en: "Ecuador",
-    name_es: "Ecuador",
-    dial_code: "593",
-    code: "EC",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Egypt",
-    name_es: "Egipto",
-    dial_code: "20",
-    code: "EG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "El Salvador",
-    name_es: "El Salvador",
-    dial_code: "503",
-    code: "SV",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Equatorial Guinea",
-    name_es: "Guinea Ecuatorial",
-    dial_code: "240",
+    name: "Equatorial Guinea",
+    callingCode: "240",
     code: "GQ",
-    currency: 'PEN'
+    flag: "🇬🇶",
   },
+  { name: "Eritrea", callingCode: "291", code: "ER", flag: "🇪🇷" },
+  { name: "Estonia", callingCode: "372", code: "EE", flag: "🇪🇪" },
+  { name: "Ethiopia", callingCode: "251", code: "ET", flag: "🇪🇹" },
   {
-    name_en: "Eritrea",
-    name_es: "Eritrea",
-    dial_code: "291",
-    code: "ER",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Estonia",
-    name_es: "Estonia",
-    dial_code: "372",
-    code: "EE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Ethiopia",
-    name_es: "Etiopía",
-    dial_code: "251",
-    code: "ET",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Falkland Islands (Malvinas)",
-    name_es: "Islas Malvinas",
-    dial_code: "500",
+    name: "Falkland Islands (Malvinas)",
+    callingCode: "500",
     code: "FK",
-    currency: 'PEN'
+    flag: "🇫🇰",
   },
+  { name: "Faroe Islands", callingCode: "298", code: "FO", flag: "🇫🇴" },
+  { name: "Fiji", callingCode: "679", code: "FJ", flag: "🇫🇯" },
+  { name: "Finland", callingCode: "358", code: "FI", flag: "🇫🇮" },
+  { name: "France", callingCode: "33", code: "FR", flag: "🇫🇷" },
+  { name: "French Guiana", callingCode: "594", code: "GF", flag: "🇬🇫" },
   {
-    name_en: "Faroe Islands",
-    name_es: "Islas Feroe",
-    dial_code: "298",
-    code: "FO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Fiji",
-    name_es: "Fiyi",
-    dial_code: "679",
-    code: "FJ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Finland",
-    name_es: "Finlandia",
-    dial_code: "358",
-    code: "FI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "France",
-    name_es: "Francia",
-    dial_code: "33",
-    code: "FR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "French Guiana",
-    name_es: "Guayana Francesa",
-    dial_code: "594",
-    code: "GF",
-    currency: 'PEN'
-  },
-  {
-    name_en: "French Polynesia",
-    name_es: "Polinesia Francesa",
-    dial_code: "689",
+    name: "French Polynesia",
+    callingCode: "689",
     code: "PF",
-    currency: 'PEN'
+    flag: "🇵🇫",
   },
   {
-    name_en: "Gabon",
-    name_es: "Gabón",
-    dial_code: "241",
-    code: "GA",
-    currency: 'PEN'
+    name: "French Southern Territories",
+    callingCode: "262",
+    code: "TF",
+    flag: "🇹🇫",
+  },
+  { name: "Gabon", callingCode: "241", code: "GA", flag: "🇬🇦" },
+  { name: "Gambia", callingCode: "220", code: "GM", flag: "🇬🇲" },
+  { name: "Georgia", callingCode: "995", code: "GE", flag: "🇬🇪" },
+  { name: "Germany", callingCode: "49", code: "DE", flag: "🇩🇪" },
+  { name: "Ghana", callingCode: "233", code: "GH", flag: "🇬🇭" },
+  { name: "Gibraltar", callingCode: "350", code: "GI", flag: "🇬🇮" },
+  { name: "Greece", callingCode: "30", code: "GR", flag: "🇬🇷" },
+  { name: "Greenland", callingCode: "299", code: "GL", flag: "🇬🇱" },
+  { name: "Grenada", callingCode: "1473", code: "GD", flag: "🇬🇩" },
+  { name: "Guadeloupe", callingCode: "590", code: "GP", flag: "🇬🇵" },
+  { name: "Guam", callingCode: "1671", code: "GU", flag: "🇬🇺" },
+  { name: "Guatemala", callingCode: "502", code: "GT", flag: "🇬🇹" },
+  { name: "Guernsey", callingCode: "44", code: "GG", flag: "🇬🇬" },
+  { name: "Guinea", callingCode: "224", code: "GN", flag: "🇬🇳" },
+  { name: "Guinea-Bissau", callingCode: "245", code: "GW", flag: "🇬🇼" },
+  { name: "Guyana", callingCode: "592", code: "GY", flag: "🇬🇾" },
+  { name: "Haiti", callingCode: "509", code: "HT", flag: "🇭🇹" },
+  {
+    name: "Heard Island and Mcdonald Islands",
+    callingCode: "0",
+    code: "HM",
+    flag: "🏳",
   },
   {
-    name_en: "Gambia",
-    name_es: "Gambia",
-    dial_code: "220",
-    code: "GM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Georgia",
-    name_es: "Georgia",
-    dial_code: "995",
-    code: "GE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Germany",
-    name_es: "Alemania",
-    dial_code: "49",
-    code: "DE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Ghana",
-    name_es: "Ghana",
-    dial_code: "233",
-    code: "GH",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Gibraltar",
-    name_es: "Gibraltar",
-    dial_code: "350",
-    code: "GI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Greece",
-    name_es: "Grecia",
-    dial_code: "30",
-    code: "GR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Greenland",
-    name_es: "Groenlandia",
-    dial_code: "299",
-    code: "GL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Grenada",
-    name_es: "Granada",
-    dial_code: "1473",
-    code: "GD",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Guadeloupe",
-    name_es: "Guadalupe",
-    dial_code: "590",
-    code: "GP",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Guam",
-    name_es: "Guam",
-    dial_code: "1671",
-    code: "GU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Guatemala",
-    name_es: "Guatemala",
-    dial_code: "502",
-    code: "GT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Guernsey",
-    name_es: "Guernsey",
-    dial_code: "44",
-    code: "GG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Guinea",
-    name_es: "Guinea",
-    dial_code: "224",
-    code: "GN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Guinea-Bissau",
-    name_es: "Guinea-Bisau",
-    dial_code: "245",
-    code: "GW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Guyana",
-    name_es: "Guyana",
-    dial_code: "595",
-    code: "GY",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Haiti",
-    name_es: "Haití",
-    dial_code: "509",
-    code: "HT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Holy See (Vatican City State)",
-    name_es: "Ciudad del Vaticano",
-    dial_code: "379",
+    name: "Holy See (Vatican City State)",
+    callingCode: "379",
     code: "VA",
-    currency: 'PEN'
+    flag: "🇻🇦",
   },
+  { name: "Honduras", callingCode: "504", code: "HN", flag: "🇭🇳" },
+  { name: "Hong Kong", callingCode: "852", code: "HK", flag: "🇭🇰" },
+  { name: "Hungary", callingCode: "36", code: "HU", flag: "🇭🇺" },
+  { name: "Iceland", callingCode: "354", code: "IS", flag: "🇮🇸" },
+  { name: "India", callingCode: "91", code: "IN", flag: "🇮🇳" },
+  { name: "Indonesia", callingCode: "62", code: "ID", flag: "🇮🇩" },
   {
-    name_en: "Honduras",
-    name_es: "Honduras",
-    dial_code: "504",
-    code: "HN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Hong Kong",
-    name_es: "Hong Kong",
-    dial_code: "852",
-    code: "HK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Hungary",
-    name_es: "Hungría",
-    dial_code: "36",
-    code: "HU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Iceland",
-    name_es: "Islandia",
-    dial_code: "354",
-    code: "IS",
-    currency: 'PEN'
-  },
-  {
-    name_en: "India",
-    name_es: "India",
-    dial_code: "91",
-    code: "IN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Indonesia",
-    name_es: "Indonesia",
-    dial_code: "62",
-    code: "ID",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Iran, Islamic Republic of",
-    name_es: "Irán",
-    dial_code: "98",
+    name: "Iran, Islamic Republic of Persian Gulf",
+    callingCode: "98",
     code: "IR",
-    currency: 'PEN'
+    flag: "🇮🇷",
   },
+  { name: "Iraq", callingCode: "964", code: "IQ", flag: "🇮🇶" },
+  { name: "Ireland", callingCode: "353", code: "IE", flag: "🇮🇪" },
+  { name: "Isle of Man", callingCode: "44", code: "IM", flag: "🇮🇲" },
+  { name: "Israel", callingCode: "972", code: "IL", flag: "🇮🇱" },
+  { name: "Italy", callingCode: "39", code: "IT", flag: "🇮🇹" },
+  { name: "Jamaica", callingCode: "1876", code: "JM", flag: "🇯🇲" },
+  { name: "Japan", callingCode: "81", code: "JP", flag: "🇯🇵" },
+  { name: "Jersey", callingCode: "44", code: "JE", flag: "🇯🇪" },
+  { name: "Jordan", callingCode: "962", code: "JO", flag: "🇯🇴" },
+  { name: "Kazakhstan", callingCode: "7", code: "KZ", flag: "🇰🇿" },
+  { name: "Kenya", callingCode: "254", code: "KE", flag: "🇰🇪" },
+  { name: "Kiribati", callingCode: "686", code: "KI", flag: "🇰🇮" },
   {
-    name_en: "Iraq",
-    name_es: "Iraq",
-    dial_code: "964",
-    code: "IQ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Ireland",
-    name_es: "Irlanda",
-    dial_code: "353",
-    code: "IE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Isle of Man",
-    name_es: "Isla de Man",
-    dial_code: "44",
-    code: "IM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Israel",
-    name_es: "Israel",
-    dial_code: "972",
-    code: "IL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Italy",
-    name_es: "Italia",
-    dial_code: "39",
-    code: "IT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Jamaica",
-    name_es: "Jamaica",
-    dial_code: "1876",
-    code: "JM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Japan",
-    name_es: "Japón",
-    dial_code: "81",
-    code: "JP",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Jersey",
-    name_es: "Jersey",
-    dial_code: "44",
-    code: "JE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Jordan",
-    name_es: "Jordania",
-    dial_code: "962",
-    code: "JO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Kazakhstan",
-    name_es: "Kazajistán",
-    dial_code: "7",
-    code: "KZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Kenya",
-    name_es: "Kenia",
-    dial_code: "254",
-    code: "KE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Kiribati",
-    name_es: "Kiribati",
-    dial_code: "686",
-    code: "KI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Korea, Democratic People's Republic of",
-    name_es: "Corea del Norte",
-    dial_code: "850",
+    name: "Korea, Democratic People's Republic of Korea",
+    callingCode: "850",
     code: "KP",
-    currency: 'PEN'
+    flag: "🇰🇵",
   },
   {
-    name_en: "Korea, Republic of",
-    name_es: "Corea del Sur",
-    dial_code: "82",
+    name: "Korea, Republic of South Korea",
+    callingCode: "82",
     code: "KR",
-    currency: 'PEN'
+    flag: "🇰🇷",
   },
+  { name: "Kosovo", callingCode: "383", code: "XK", flag: "🇽🇰" },
+  { name: "Kuwait", callingCode: "965", code: "KW", flag: "🇰🇼" },
+  { name: "Kyrgyzstan", callingCode: "996", code: "KG", flag: "🇰🇬" },
+  { name: "Laos", callingCode: "856", code: "LA", flag: "🇱🇦" },
+  { name: "Latvia", callingCode: "371", code: "LV", flag: "🇱🇻" },
+  { name: "Lebanon", callingCode: "961", code: "LB", flag: "🇱🇧" },
+  { name: "Lesotho", callingCode: "266", code: "LS", flag: "🇱🇸" },
+  { name: "Liberia", callingCode: "231", code: "LR", flag: "🇱🇷" },
   {
-    name_en: "Kosovo",
-    name_es: "Kosovo",
-    dial_code: "383",
-    code: "XK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Kuwait",
-    name_es: "Kuwait",
-    dial_code: "965",
-    code: "KW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Kyrgyzstan",
-    name_es: "Kirguistán",
-    dial_code: "996",
-    code: "KG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Lao People's Democratic Republic",
-    name_es: "Laos",
-    dial_code: "856",
-    code: "LA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Latvia",
-    name_es: "Letonia",
-    dial_code: "371",
-    code: "LV",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Lebanon",
-    name_es: "Líbano",
-    dial_code: "961",
-    code: "LB",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Lesotho",
-    name_es: "Lesoto",
-    dial_code: "266",
-    code: "LS",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Liberia",
-    name_es: "Liberia",
-    dial_code: "231",
-    code: "LR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Libyan Arab Jamahiriya",
-    name_es: "Libia",
-    dial_code: "218",
+    name: "Libyan Arab Jamahiriya",
+    callingCode: "218",
     code: "LY",
-    currency: 'PEN'
+    flag: "🇱🇾",
   },
+  { name: "Liechtenstein", callingCode: "423", code: "LI", flag: "🇱🇮" },
+  { name: "Lithuania", callingCode: "370", code: "LT", flag: "🇱🇹" },
+  { name: "Luxembourg", callingCode: "352", code: "LU", flag: "🇱🇺" },
+  { name: "Macao", callingCode: "853", code: "MO", flag: "🇲🇴" },
+  { name: "Macedonia", callingCode: "389", code: "MK", flag: "🇲🇰" },
+  { name: "Madagascar", callingCode: "261", code: "MG", flag: "🇲🇬" },
+  { name: "Malawi", callingCode: "265", code: "MW", flag: "🇲🇼" },
+  { name: "Malaysia", callingCode: "60", code: "MY", flag: "🇲🇾" },
+  { name: "Maldives", callingCode: "960", code: "MV", flag: "🇲🇻" },
+  { name: "Mali", callingCode: "223", code: "ML", flag: "🇲🇱" },
+  { name: "Malta", callingCode: "356", code: "MT", flag: "🇲🇹" },
   {
-    name_en: "Liechtenstein",
-    name_es: "Liechtenstein",
-    dial_code: "423",
-    code: "LI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Lithuania",
-    name_es: "Lituania",
-    dial_code: "370",
-    code: "LT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Luxembourg",
-    name_es: "Luxemburgo",
-    dial_code: "352",
-    code: "LU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Macao",
-    name_es: "Macao",
-    dial_code: "853",
-    code: "MO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Macedonia, The Former Yugoslav Republic of",
-    name_es: "República de Macedonia",
-    dial_code: "389",
-    code: "MK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Madagascar",
-    name_es: "Madagascar",
-    dial_code: "261",
-    code: "MG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Malawi",
-    name_es: "Malaui",
-    dial_code: "265",
-    code: "MW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Malaysia",
-    name_es: "Malasia",
-    dial_code: "60",
-    code: "MY",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Maldives",
-    name_es: "Maldivas",
-    dial_code: "960",
-    code: "MV",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Mali",
-    name_es: "Malí",
-    dial_code: "223",
-    code: "ML",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Malta",
-    name_es: "Malta",
-    dial_code: "356",
-    code: "MT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Marshall Islands",
-    name_es: "Islas Marshall",
-    dial_code: "692",
+    name: "Marshall Islands",
+    callingCode: "692",
     code: "MH",
-    currency: 'PEN'
+    flag: "🇲🇭",
   },
+  { name: "Martinique", callingCode: "596", code: "MQ", flag: "🇲🇶" },
+  { name: "Mauritania", callingCode: "222", code: "MR", flag: "🇲🇷" },
+  { name: "Mauritius", callingCode: "230", code: "MU", flag: "🇲🇺" },
+  { name: "Mayotte", callingCode: "262", code: "YT", flag: "🇾🇹" },
+  { name: "Mexico", callingCode: "52", code: "MX", flag: "🇲🇽" },
   {
-    name_en: "Martinique",
-    name_es: "Martinica",
-    dial_code: "596",
-    code: "MQ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Mauritania",
-    name_es: "Mauritania",
-    dial_code: "222",
-    code: "MR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Mauritius",
-    name_es: "Mauricio",
-    dial_code: "230",
-    code: "MU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Mayotte",
-    name_es: "Mayotte",
-    dial_code: "262",
-    code: "YT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Mexico",
-    name_es: "México",
-    dial_code: "52",
-    code: "MX",
-    currency: 'MXN'
-  },
-  {
-    name_en: "Micronesia, Federated States of",
-    name_es: "Estados Federados de Micronesia",
-    dial_code: "691",
+    name: "Micronesia, Federated States of Micronesia",
+    callingCode: "691",
     code: "FM",
-    currency: 'PEN'
+    flag: "🇫🇲",
   },
+  { name: "Moldova", callingCode: "373", code: "MD", flag: "🇲🇩" },
+  { name: "Monaco", callingCode: "377", code: "MC", flag: "🇲🇨" },
+  { name: "Mongolia", callingCode: "976", code: "MN", flag: "🇲🇳" },
+  { name: "Montenegro", callingCode: "382", code: "ME", flag: "🇲🇪" },
+  { name: "Montserrat", callingCode: "1664", code: "MS", flag: "🇲🇸" },
+  { name: "Morocco", callingCode: "212", code: "MA", flag: "🇲🇦" },
+  { name: "Mozambique", callingCode: "258", code: "MZ", flag: "🇲🇿" },
+  { name: "Myanmar", callingCode: "95", code: "MM", flag: "🇲🇲" },
+  { name: "Namibia", callingCode: "264", code: "NA", flag: "🇳🇦" },
+  { name: "Nauru", callingCode: "674", code: "NR", flag: "🇳🇷" },
+  { name: "Nepal", callingCode: "977", code: "NP", flag: "🇳🇵" },
+  { name: "Netherlands", callingCode: "31", code: "NL", flag: "🇳🇱" },
   {
-    name_en: "Moldova, Republic of",
-    name_es: "Moldavia",
-    dial_code: "373",
-    code: "MD",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Monaco",
-    name_es: "Monaco",
-    dial_code: "377",
-    code: "MC",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Mongolia",
-    name_es: "Mongolia",
-    dial_code: "976",
-    code: "MN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Montenegro",
-    name_es: "Montenegro",
-    dial_code: "382",
-    code: "ME",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Montserrat",
-    name_es: "Montserrat",
-    dial_code: "1664",
-    code: "MS",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Morocco",
-    name_es: "Marruecos",
-    dial_code: "212",
-    code: "MA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Mozambique",
-    name_es: "Mozambique",
-    dial_code: "258",
-    code: "MZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Myanmar",
-    name_es: "Birmania",
-    dial_code: "95",
-    code: "MM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Namibia",
-    name_es: "Namibia",
-    dial_code: "264",
-    code: "NA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Nauru",
-    name_es: "Nauru",
-    dial_code: "674",
-    code: "NR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Nepal",
-    name_es: "Nepal",
-    dial_code: "977",
-    code: "NP",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Netherlands",
-    name_es: "Holanda",
-    dial_code: "31",
-    code: "NL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Netherlands Antilles",
-    name_es: "Antillas Holandesas",
-    dial_code: "599",
+    name: "Netherlands Antilles",
+    callingCode: "599",
     code: "AN",
-    currency: 'PEN'
+    flag: "🇳🇱",
   },
+  { name: "New Caledonia", callingCode: "687", code: "NC", flag: "🇳🇨" },
+  { name: "New Zealand", callingCode: "64", code: "NZ", flag: "🇳🇿" },
+  { name: "Nicaragua", callingCode: "505", code: "NI", flag: "🇳🇮" },
+  { name: "Niger", callingCode: "227", code: "NE", flag: "🇳🇪" },
+  { name: "Nigeria", callingCode: "234", code: "NG", flag: "🇳🇬" },
+  { name: "Niue", callingCode: "683", code: "NU", flag: "🇳🇺" },
+  { name: "Norfolk Island", callingCode: "672", code: "NF", flag: "🇳🇫" },
   {
-    name_en: "New Caledonia",
-    name_es: "Nueva Caledonia",
-    dial_code: "687",
-    code: "NC",
-    currency: 'PEN'
-  },
-  {
-    name_en: "New Zealand",
-    name_es: "Nueva Zelanda",
-    dial_code: "64",
-    code: "NZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Nicaragua",
-    name_es: "Nicaragua",
-    dial_code: "505",
-    code: "NI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Niger",
-    name_es: "Niger",
-    dial_code: "227",
-    code: "NE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Nigeria",
-    name_es: "Nigeria",
-    dial_code: "234",
-    code: "NG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Niue",
-    name_es: "Niue",
-    dial_code: "683",
-    code: "NU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "NorfolkIsland",
-    name_es: "IslaNorfolk",
-    dial_code: "672",
-    code: "NF",
-    currency: 'PEN'
-  },
-  {
-    name_en: "NorthernMarianaIslands",
-    name_es: "IslasMarianasdelNorte",
-    dial_code: "1670",
+    name: "Northern Mariana Islands",
+    callingCode: "1670",
     code: "MP",
-    currency: 'PEN'
+    flag: "🏳",
   },
+  { name: "Norway", callingCode: "47", code: "NO", flag: "🇳🇴" },
+  { name: "Oman", callingCode: "968", code: "OM", flag: "🇴🇲" },
+  { name: "Pakistan", callingCode: "92", code: "PK", flag: "🇵🇰" },
+  { name: "Palau", callingCode: "680", code: "PW", flag: "🇵🇼" },
   {
-    name_en: "Norway",
-    name_es: "Noruega",
-    dial_code: "47",
-    code: "NO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Oman",
-    name_es: "Omán",
-    dial_code: "968",
-    code: "OM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Pakistan",
-    name_es: "Pakistán",
-    dial_code: "92",
-    code: "PK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Palau",
-    name_es: "Palaos",
-    dial_code: "680",
-    code: "PW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Panama",
-    name_es: "Panamá",
-    dial_code: "507",
-    code: "PA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Papua New Guinea",
-    name_es: "Papúa Nueva Guinea",
-    dial_code: "675",
-    code: "PG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Paraguay",
-    name_es: "Paraguay",
-    dial_code: "595",
-    code: "PY",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Peru",
-    name_es: "Perú",
-    dial_code: "51",
-    code: "PE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Philippines",
-    name_es: "Filipinas",
-    dial_code: "63",
-    code: "PH",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Pitcairn",
-    name_es: "Islas Pitcairn",
-    dial_code: "872",
-    code: "PN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Poland",
-    name_es: "Polonia",
-    dial_code: "48",
-    code: "PL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Portugal",
-    name_es: "Portugal",
-    dial_code: "351",
-    code: "PT",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Puerto Rico",
-    name_es: "Puerto Rico",
-    dial_code: "1",
-    code: "PR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Qatar",
-    name_es: "Qatar",
-    dial_code: "974",
-    code: "QA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Romania",
-    name_es: "Rumania",
-    dial_code: "40",
-    code: "RO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Russia",
-    name_es: "Rusia",
-    dial_code: "7",
-    code: "RU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Rwanda",
-    name_es: "Ruanda",
-    dial_code: "250",
-    code: "RW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Réunion",
-    name_es: "Reunion",
-    dial_code: "262",
-    code: "RE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saint Barthélemy",
-    name_es: "San Bartolome",
-    dial_code: "590",
-    code: "BL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saint Helena, Ascension and Tristan Da Cunha",
-    name_es: "Santa Elena, Ascensión y Tristán de Acuña",
-    dial_code: "290",
-    code: "SH",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saint Kitts and Nevis",
-    name_es: "San Cristóbal y Nieves",
-    dial_code: "1869",
-    code: "KN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saint Lucia",
-    name_es: "Santa Lucía",
-    dial_code: "1758",
-    code: "LC",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saint Martin",
-    name_es: "Isla de San Martín",
-    dial_code: "590",
-    code: "MF",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saint Pierre and Miquelon",
-    name_es: "San Pedro y Miquelon",
-    dial_code: "508",
-    code: "PM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saint Vincent and the Grenadines",
-    name_es: "San Vicente y las Granadinas",
-    dial_code: "1784",
-    code: "VC",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Samoa",
-    name_es: "Samoa",
-    dial_code: "685",
-    code: "WS",
-    currency: 'PEN'
-  },
-  {
-    name_en: "San Marino",
-    name_es: "San Marino",
-    dial_code: "378",
-    code: "SM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Sao Tome and Principe",
-    name_es: " Santo Tomé y Príncipe",
-    dial_code: "239",
-    code: "ST",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Saudi Arabia",
-    name_es: "Arabia Saudita",
-    dial_code: "966",
-    code: "SA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Senegal",
-    name_es: "Senegal",
-    dial_code: "221",
-    code: "SN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Serbia",
-    name_es: "Serbia",
-    dial_code: "381",
-    code: "RS",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Seychelles",
-    name_es: "Seychelles",
-    dial_code: "248",
-    code: "SC",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Sierra Leone",
-    name_es: "Sierra Leona",
-    dial_code: "232",
-    code: "SL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Singapore",
-    name_es: "Singapur",
-    dial_code: "65",
-    code: "SG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Slovakia",
-    name_es: "Eslovaquia",
-    dial_code: "421",
-    code: "SK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Slovenia",
-    name_es: "Eslovenia",
-    dial_code: "386",
-    code: "SI",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Solomon Islands",
-    name_es: "Islas Salomón",
-    dial_code: "677",
-    code: "SB",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Somalia",
-    name_es: "Somalia",
-    dial_code: "252",
-    code: "SO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "South Africa",
-    name_es: "Sudáfrica",
-    dial_code: "27",
-    code: "ZA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "South Sudan",
-    name_es: "Sudán del Sur",
-    dial_code: "211",
-    code: "SS",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Spain",
-    name_es: "España",
-    dial_code: "34",
-    code: "ES",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Sri Lanka",
-    name_es: "Sri Lanka",
-    dial_code: "94",
-    code: "LK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "State of Palestine",
-    name_es: "Estado de Palestina",
-    dial_code: "970",
+    name: "Palestinian Territory, Occupied",
+    callingCode: "970",
     code: "PS",
-    currency: 'PEN'
+    flag: "🇵🇸",
+  },
+  { name: "Panama", callingCode: "507", code: "PA", flag: "🇵🇦" },
+  {
+    name: "Papua New Guinea",
+    callingCode: "675",
+    code: "PG",
+    flag: "🇵🇬",
+  },
+  { name: "Paraguay", callingCode: "595", code: "PY", flag: "🇵🇾" },
+  { name: "Peru", callingCode: "51", code: "PE", flag: "🇵🇪" },
+  { name: "Philippines", callingCode: "63", code: "PH", flag: "🇵🇭" },
+  { name: "Pitcairn", callingCode: "64", code: "PN", flag: "🇵🇳" },
+  { name: "Poland", callingCode: "48", code: "PL", flag: "🇵🇱" },
+  { name: "Portugal", callingCode: "351", code: "PT", flag: "🇵🇹" },
+  { name: "Puerto Rico", callingCode: "1939", code: "PR", flag: "🇵🇷" },
+  { name: "Qatar", callingCode: "974", code: "QA", flag: "🇶🇦" },
+  { name: "Romania", callingCode: "40", code: "RO", flag: "🇷🇴" },
+  { name: "Russia", callingCode: "7", code: "RU", flag: "🇷🇺" },
+  { name: "Rwanda", callingCode: "250", code: "RW", flag: "🇷🇼" },
+  { name: "Reunion", callingCode: "262", code: "RE", flag: "🇫🇷" },
+  {
+    name: "Saint Barthelemy",
+    callingCode: "590",
+    code: "BL",
+    flag: "🇧🇱",
   },
   {
-    name_en: "Sudan",
-    name_es: "Sudán",
-    dial_code: "249",
-    code: "SD",
-    currency: 'PEN'
+    name: "Saint Helena, Ascension and Tristan Da Cunha",
+    callingCode: "290",
+    code: "SH",
+    flag: "🇸🇭",
   },
   {
-    name_en: "Suriname",
-    name_es: "Surinam",
-    dial_code: "597",
-    code: "SR",
-    currency: 'PEN'
+    name: "Saint Kitts and Nevis",
+    callingCode: "1869",
+    code: "KN",
+    flag: "🇰🇳",
+  },
+  { name: "Saint Lucia", callingCode: "1758", code: "LC", flag: "🇱🇨" },
+  { name: "Saint Martin", callingCode: "590", code: "MF", flag: "🏳" },
+  {
+    name: "Saint Pierre and Miquelon",
+    callingCode: "508",
+    code: "PM",
+    flag: "🇵🇲",
   },
   {
-    name_en: "Svalbard and Jan Mayen",
-    name_es: "Svalbard y Jan Mayen",
-    dial_code: "47",
+    name: "Saint Vincent and the Grenadines",
+    callingCode: "1784",
+    code: "VC",
+    flag: "🇻🇨",
+  },
+  { name: "Samoa", callingCode: "685", code: "WS", flag: "🇼🇸" },
+  { name: "San Marino", callingCode: "378", code: "SM", flag: "🇸🇲" },
+  {
+    name: "Sao Tome and Principe",
+    callingCode: "239",
+    code: "ST",
+    flag: "🇸🇹",
+  },
+  { name: "Saudi Arabia", callingCode: "966", code: "SA", flag: "🇸🇦" },
+  { name: "Senegal", callingCode: "221", code: "SN", flag: "🇸🇳" },
+  { name: "Serbia", callingCode: "381", code: "RS", flag: "🇷🇸" },
+  { name: "Seychelles", callingCode: "248", code: "SC", flag: "🇸🇨" },
+  { name: "Sierra Leone", callingCode: "232", code: "SL", flag: "🇸🇱" },
+  { name: "Singapore", callingCode: "65", code: "SG", flag: "🇸🇬" },
+  { name: "Slovakia", callingCode: "421", code: "SK", flag: "🇸🇰" },
+  { name: "Slovenia", callingCode: "386", code: "SI", flag: "🇸🇮" },
+  {
+    name: "Solomon Islands",
+    callingCode: "677",
+    code: "SB",
+    flag: "🇸🇧",
+  },
+  { name: "Somalia", callingCode: "252", code: "SO", flag: "🇸🇴" },
+  { name: "South Africa", callingCode: "27", code: "ZA", flag: "🇿🇦" },
+  { name: "South Sudan", callingCode: "211", code: "SS", flag: "🇸🇸" },
+  {
+    name: "South Georgia and the South Sandwich Islands",
+    callingCode: "500",
+    code: "GS",
+    flag: "🇬🇸",
+  },
+  { name: "Spain", callingCode: "34", code: "ES", flag: "🇪🇸" },
+  { name: "Sri Lanka", callingCode: "94", code: "LK", flag: "🇱🇰" },
+  { name: "Sudan", callingCode: "249", code: "SD", flag: "🇸🇩" },
+  { name: "Suriname", callingCode: "597", code: "SR", flag: "🇸🇷" },
+  {
+    name: "Svalbard and Jan Mayen",
+    callingCode: "47",
     code: "SJ",
-    currency: 'PEN'
+    flag: "🇩🇰",
   },
+  { name: "Swaziland", callingCode: "268", code: "SZ", flag: "🇸🇿" },
+  { name: "Sweden", callingCode: "46", code: "SE", flag: "🇸🇪" },
+  { name: "Switzerland", callingCode: "41", code: "CH", flag: "🇨🇭" },
   {
-    name_en: "Swaziland",
-    name_es: "Suazilandia",
-    dial_code: "268",
-    code: "SZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Sweden",
-    name_es: "Suecia",
-    dial_code: "46",
-    code: "SE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Switzerland",
-    name_es: "Suiza",
-    dial_code: "41",
-    code: "CH",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Syrian Arab Republic",
-    name_es: "Siria",
-    dial_code: "963",
+    name: "Syrian Arab Republic",
+    callingCode: "963",
     code: "SY",
-    currency: 'PEN'
+    flag: "🇸🇾",
   },
+  { name: "Taiwan", callingCode: "886", code: "TW", flag: "🇹🇼" },
+  { name: "Tajikistan", callingCode: "992", code: "TJ", flag: "🇹🇯" },
   {
-    name_en: "Taiwan, Province of China",
-    name_es: "Taiwán",
-    dial_code: "886",
-    code: "TW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Tayikistan",
-    name_es: "Tayikistán",
-    dial_code: "992",
-    code: "TJ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Tanzania, United Republic of",
-    name_es: "Tanzania",
-    dial_code: "255",
+    name: "Tanzania, United Republic of Tanzania",
+    callingCode: "255",
     code: "TZ",
-    currency: 'PEN'
+    flag: "🇹🇿",
   },
+  { name: "Thailand", callingCode: "66", code: "TH", flag: "🇹🇭" },
+  { name: "Timor-Leste", callingCode: "670", code: "TL", flag: "🇹🇱" },
+  { name: "Togo", callingCode: "228", code: "TG", flag: "🇹🇬" },
+  { name: "Tokelau", callingCode: "690", code: "TK", flag: "🇹🇰" },
+  { name: "Tonga", callingCode: "676", code: "TO", flag: "🇹🇴" },
   {
-    name_en: "Thailand",
-    name_es: "Tailandia",
-    dial_code: "66",
-    code: "TH",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Timor-Leste",
-    name_es: "Timor Oriental",
-    dial_code: "670",
-    code: "TL",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Togo",
-    name_es: "Togo",
-    dial_code: "228",
-    code: "TG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Tokelau",
-    name_es: "Tokelau",
-    dial_code: "690",
-    code: "TK",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Tonga",
-    name_es: "Tonga",
-    dial_code: "676",
-    code: "TO",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Trinidad and Tobago",
-    name_es: "Trinidad y Tobago",
-    dial_code: "1868",
+    name: "Trinidad and Tobago",
+    callingCode: "1868",
     code: "TT",
-    currency: 'PEN'
+    flag: "🇹🇹",
   },
+  { name: "Tunisia", callingCode: "216", code: "TN", flag: "🇹🇳" },
+  { name: "Turkey", callingCode: "90", code: "TR", flag: "🇹🇷" },
+  { name: "Turkmenistan", callingCode: "993", code: "TM", flag: "🇹🇲" },
   {
-    name_en: "Tunisia",
-    name_es: "Túnez",
-    dial_code: "216",
-    code: "TN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Turkey",
-    name_es: "Turquía",
-    dial_code: "90",
-    code: "TR",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Turkmenistan",
-    name_es: "Turkmenistán",
-    dial_code: "993",
-    code: "TM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Turks and Caicos Islands",
-    name_es: "Islas Turcas y Caicos",
-    dial_code: "1649",
+    name: "Turks and Caicos Islands",
+    callingCode: "1649",
     code: "TC",
-    currency: 'PEN'
+    flag: "🇹🇨",
   },
+  { name: "Tuvalu", callingCode: "688", code: "TV", flag: "🇹🇻" },
+  { name: "Uganda", callingCode: "256", code: "UG", flag: "🇺🇬" },
+  { name: "Ukraine", callingCode: "380", code: "UA", flag: "🇺🇦" },
   {
-    name_en: "Tuvalu",
-    name_es: "Tuvalu",
-    dial_code: "688",
-    code: "TV",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Uganda",
-    name_es: "Uganda",
-    dial_code: "256",
-    code: "UG",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Ukraine",
-    name_es: "Ucrania",
-    dial_code: "380",
-    code: "UA",
-    currency: 'PEN'
-  },
-  {
-    name_en: "United Arab Emirates",
-    name_es: "Emiratos Árabes Unidos",
-    dial_code: "971",
+    name: "United Arab Emirates",
+    callingCode: "971",
     code: "AE",
-    currency: 'PEN'
+    flag: "🇦🇪",
   },
+  { name: "United Kingdom", callingCode: "44", code: "GB", flag: "🇬🇧" },
+  { name: "United States", callingCode: "1", code: "US", flag: "🇺🇸" },
+  { name: "Uruguay", callingCode: "598", code: "UY", flag: "🇺🇾" },
+  { name: "Uzbekistan", callingCode: "998", code: "UZ", flag: "🇺🇿" },
+  { name: "Vanuatu", callingCode: "678", code: "VU", flag: "🇻🇺" },
   {
-    name_en: "United Kingdom",
-    name_es: "Reino Unido",
-    dial_code: "44",
-    code: "GB",
-    currency: 'PEN'
-  },
-  {
-    name_en: "United States",
-    name_es: "Estados Unidos",
-    dial_code: "1",
-    code: "US",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Uruguay",
-    name_es: "Uruguay",
-    dial_code: "598",
-    code: "UY",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Uzbekistan",
-    name_es: "Uzbekistán",
-    dial_code: "998",
-    code: "UZ",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Vanuatu",
-    name_es: "Vanuatu",
-    dial_code: "678",
-    code: "VU",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Venezuela, Bolivarian Republic of",
-    name_es: "Venezuela",
-    dial_code: "58",
+    name: "Venezuela, Bolivarian Republic of Venezuela",
+    callingCode: "58",
     code: "VE",
-    currency: 'PEN'
+    flag: "🇻🇪",
   },
+  { name: "Vietnam", callingCode: "84", code: "VN", flag: "🇻🇳" },
   {
-    name_en: "Vietnam",
-    name_es: "Vietnam",
-    dial_code: "84",
-    code: "VN",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Virgin Islands, British",
-    name_es: "Islas Vírgenes Británicas",
-    dial_code: "1284",
+    name: "Virgin Islands, British",
+    callingCode: "1284",
     code: "VG",
-    currency: 'PEN'
+    flag: "🇻🇬",
   },
   {
-    name_en: "Virgin Islands, U.S.",
-    name_es: "Islas Vírgenes de los Estados Unidos",
-    dial_code: "1340",
+    name: "Virgin Islands, U.S.",
+    callingCode: "1340",
     code: "VI",
-    currency: 'PEN'
+    flag: "🇻🇮",
   },
   {
-    name_en: "Wallis and Futuna",
-    name_es: "Wallis y Futuna",
-    dial_code: "681",
+    name: "Wallis and Futuna",
+    callingCode: "681",
     code: "WF",
-    currency: 'PEN'
+    flag: "🇼🇫",
   },
-  {
-    name_en: "Yemen",
-    name_es: "Yemen",
-    dial_code: "967",
-    code: "YE",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Zambia",
-    name_es: "Zambia",
-    dial_code: "260",
-    code: "ZM",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Zimbabwe",
-    name_es: "Zimbabue",
-    dial_code: "263",
-    code: "ZW",
-    currency: 'PEN'
-  },
-  {
-    name_en: "Åland Islands",
-    name_es: "Åland",
-    dial_code: "358",
-    code: "AX",
-    currency: 'PEN'
-  }
-]
+  { name: "Yemen", callingCode: "967", code: "YE", flag: "🇾🇪" },
+  { name: "Zambia", callingCode: "260", code: "ZM", flag: "🇿🇲" },
+  { name: "Zimbabwe", callingCode: "263", code: "ZW", flag: "🇿🇼" },
+];
 
-const countriesData = countries
-  .map(country => ({
-    name: country.name_es,
-    code: country.code,
-    currency: country.currency,
-    callingCode: country.dial_code
-  }))
-
-module.exports = countriesData
+module.exports = {
+  countriesData: countriesData
+} 
