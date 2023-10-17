@@ -26,26 +26,24 @@ const saveImage = async (binary, name) => {
   }
 } */
 
-const B2 = require('backblaze-b2');
+const BB2 = require('backblaze-b2');
 
-let b2 = new B2({
-  applicationKeyId: process.env.B2_KEY_ID,
-  applicationKey: process.env.B2_KEY,
-});
-
+let b2;
 let authorized = false;
 const maxAttempts = 3;  // Número máximo de intentos de autorización
 
 const handleAuthorization = async () => {
   try {
-    b2 = new B2({
+    b2 = new BB2({
       applicationKeyId: process.env.B2_KEY_ID,
       applicationKey: process.env.B2_KEY,
     });
     await b2.authorize();
     authorized = true;
   } catch (error) {
-    console.error('Error al autorizar:', error);
+    console.error('Error al autorizar:', error.message);
+    console.error("respuesta de error", error.response.data);
+    console.error(error);
     throw new Error('No se pudo autorizar con Backblaze B2');
   }
 };
@@ -77,10 +75,12 @@ const saveImage = async (binary, name) => {
 
       return '/images/' + name + '.png'; // Nombre del archivo
     } catch (error) {
-      console.error('Error al subir el archivo:', error);
+      console.error('Error al subir el archivo:', error.message);
+      console.error("respuesta de error", error.response.data);
+      console.error(error);
 
       // Si el error está relacionado con la autorización, reiniciar la bandera de autorización
-      if (error.code === 'unauthorized' || error.code === 'expired_auth_token') {
+      if (error.code === 'unauthorized' || error.code === 'expired_auth_token' || error.status === 401) {
         authorized = false;
         attempts++;  // Aumentar el contador de intentos
       } else {
