@@ -127,14 +127,17 @@ class BackblazeManager {
 }
 
 // Crea una nueva instancia de BackblazeManager
-const backblazeManager = new BackblazeManager('f1c0d42c6433', '0053ea1af114767812dea13afc04afe18c224d3dda');
+const backblazeManager = new BackblazeManager(
+  process.env.B2_KEY_ID, 
+  process.env.B2_KEY
+);
 
 const saveImage = async (binary, name) => {
   // Buffer del archivo
   const data = Buffer.from(binary, 'binary');
   const fileName = 'images/' + name + '.png';
   try {
-    const bucketId = 'ff317c409d44e2dc86a40313';
+    const bucketId = process.env.B2_BUCKET_ID;
     const uploadResponse = await backblazeManager.uploadFile(bucketId, fileName, data);
     console.log('Archivo subido con éxito:', uploadResponse);
     return "/"+fileName;
