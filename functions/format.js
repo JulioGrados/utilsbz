@@ -6,7 +6,7 @@ const FormatText = (text) => {
   const textBold = text.replace(boldRegex, "<b>$1</b>")
   const textItalic = textBold.replace(italicRegex, "<i>$1</i>")
   const textStriketrough = textItalic.replace(striketroughRegex, "<s>$1</s>")
-
+  
   return textStriketrough
 }
 
