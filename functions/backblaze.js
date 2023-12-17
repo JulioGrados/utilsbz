@@ -108,6 +108,7 @@ const backblazeManager = new BackblazeManager(
 const saveFile = async (binary, fileName) => {
   // Buffer del archivo
   const data = Buffer.from(binary, 'binary');
+  console.log('data', data)
   try {
     const bucketId = process.env.B2_BUCKET_ID;
     const uploadResponse = await backblazeManager.uploadFile(bucketId, fileName, data);

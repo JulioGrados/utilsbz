@@ -8,6 +8,10 @@ const createMessage = async data => {
   return post('/messages', data)
 }
 
+const createMessageMedia = async data => {
+  return post('/messages/media', data)
+}
+
 const detailMessage = async (id, params) => {
   return getOne(`/messages/${id}`, params)
 }
@@ -23,6 +27,7 @@ const removeMessage = async id => {
 module.exports = {
   listMessages,
   createMessage,
+  createMessageMedia,
   updateMessage,
   detailMessage,
   removeMessage
