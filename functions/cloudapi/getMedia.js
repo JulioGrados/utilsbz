@@ -3,7 +3,7 @@
 const axios = require('axios')
 const { saveImage } = require('../image')
 
-const getMedia = async (id, token) => {
+const getFile = async (id, token) => {
   try {
     const response = await axios({
       method: 'GET',
@@ -15,7 +15,7 @@ const getMedia = async (id, token) => {
     })
     console.log('response', response)
     const url = response && response.data && response.data.url
-    const image = await axios({
+    const file = await axios({
       method: 'GET',
       url: url,
       responseType: 'arraybuffer',
@@ -25,13 +25,13 @@ const getMedia = async (id, token) => {
       }
     })
     // console.log('image', image)
-    const saveUrl = await saveImage(image.data, id)
-    return saveUrl
+    // const saveUrl = await saveImage(image.data, id)
+    return file && response.data && {file: file.data, type: response.data.mime_type}
   } catch (error) {
     console.log('error', error)
   }
 }
 
 module.exports = {
-  getMedia
+  getFile
 }

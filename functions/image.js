@@ -32,10 +32,10 @@ const saveImage = async (binary, name) => {
 
 
 const saveImage = async (binary, name) => {
-  const fileName = 'images/' + name + '.png';
+  // const fileName = 'images/' + name + '.png';
   // Guardar la imagen en Backblaze
-  await saveFile(binary, fileName);
-  return "/"+fileName;
+  const fileName = await saveFile(binary, name);
+  return fileName
 };
 
 
