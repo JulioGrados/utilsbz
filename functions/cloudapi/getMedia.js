@@ -3,7 +3,7 @@
 const axios = require('axios')
 const { saveImage } = require('../image')
 
-const getFile = async (id, token) => {
+const getMedia = async (id, token) => {
   try {
     const response = await axios({
       method: 'GET',
@@ -33,5 +33,5 @@ const getFile = async (id, token) => {
 }
 
 module.exports = {
-  getFile
+  getMedia
 }
