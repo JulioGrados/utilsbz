@@ -25,14 +25,19 @@ const isLoggedUser = async ctx => {
 }
 
 const isLoggedRole = async ctx => {
-  const roles = ctx && ctx.currentUser && ctx.currentUser.roles
-  
-  if (roles.length && roles.includes('Administrador') || roles.includes('Recepcionista') ) {
-    return { roles: roles }
-  } else {
+  const rol = ctx && ctx.currentUser && ctx.currentUser.rol
+
+  if (!ctx.jwt) {
     redirect({ ctx, location: '/login' })
     return null
   }
+  
+  if (rol !== 'Admin') {
+    redirect({ ctx, location: '/401' })
+    return null
+  } 
+
+  return { jwt: ctx.jwt }
 }
 
 module.exports = {
