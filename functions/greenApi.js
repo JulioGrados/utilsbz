@@ -33,7 +33,7 @@ const sendMessageTextGreen = async (idInstance, token, chatId, text) => {
         'Content-Type': 'application/json'
       }
     })
-    console.log('resp', resp)
+    // console.log('resp', resp)
     return resp
   } catch (error) {
     throw error
@@ -55,7 +55,7 @@ const sendMessageMediaGreen = async (idInstance, token, chatId, url, filename = 
         'Content-Type': 'application/json'
       }
     })
-    console.log('resp', resp)
+    // console.log('resp', resp)
     return resp
   } catch (error) {
     throw error

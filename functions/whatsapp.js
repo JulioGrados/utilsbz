@@ -1,6 +1,6 @@
+const { saveFileHookAws } = require("./aws")
 const { countriesData } = require("./countries")
 const { getFile } = require("./file")
-const { saveImage } = require("./image")
 
 const principalBody = (body) => {
     let names = '', msgId = '', typeMsg = ''
@@ -55,7 +55,7 @@ const principalBody = (body) => {
     let route = ''
     // console.log('extension', extension)
     if (file) {
-      route = await saveImage(file, `${msgId}.${extension}`)
+      route = await saveFileHookAws(file, `${msgId}.${extension}`)
     }
   
     return route

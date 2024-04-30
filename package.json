@@ -17,6 +17,7 @@
   },
   "homepage": "https://bitbucket.org/devcodela/utilsbz#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.565.0",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "chalk": "^3.0.0",
