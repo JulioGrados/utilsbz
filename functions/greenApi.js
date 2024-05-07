@@ -1,4 +1,5 @@
 const axios = require('axios')
+const whatsAppClient = require('@green-api/whatsapp-api-client')
 
 const deleteMessageGreen = async (idInstance, token, chatId, idMessage) => {
   try {
@@ -62,8 +63,23 @@ const sendMessageMediaGreen = async (idInstance, token, chatId, url, filename = 
   }
 }
 
+const sendGreenClient = async (idInstance, token, mobile, caption, route, fileName, typeMessage) => {
+  let response
+  const restAPI = whatsAppClient.restAPI(({
+    idInstance: idInstance,
+    apiTokenInstance: token
+  }))
+  if (typeMessage === 'image' || typeMessage === 'video' || typeMessage === 'document') { 
+    response = await restAPI.file.sendFileByUrl(`${mobile}@c.us`, null, route, fileName, caption)
+  } else {
+    response = await restAPI.message.sendMessage(`${mobile}@c.us`, null, caption)
+  }
+  return response
+}
+
 module.exports = {
   deleteMessageGreen,
   sendMessageTextGreen,
-  sendMessageMediaGreen
+  sendMessageMediaGreen,
+  sendGreenClient
 }
