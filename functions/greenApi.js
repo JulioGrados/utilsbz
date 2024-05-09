@@ -1,6 +1,25 @@
 const axios = require('axios')
 const whatsAppClient = require('@green-api/whatsapp-api-client')
 
+const existWspGreen = async (idInstance, token, mobile) => {
+  try {
+    const resp = await axios({
+      method: 'POST',
+      url: `https://api.greenapi.com/waInstance${idInstance}/checkWhatsapp/${token}`,
+      data: {
+        phoneNumber: parseInt(mobile)
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    // console.log('resp', resp)
+    return resp
+  } catch (error) {
+    throw error
+  }
+}
+
 const deleteMessageGreen = async (idInstance, token, chatId, idMessage) => {
   try {
     const resp = await axios({
@@ -14,7 +33,7 @@ const deleteMessageGreen = async (idInstance, token, chatId, idMessage) => {
         'Content-Type': 'application/json'
       }
     })
-    console.log('resp', resp)
+    // console.log('resp', resp)
     return resp
   } catch (error) {
     throw error
@@ -78,6 +97,7 @@ const sendGreenClient = async (idInstance, token, mobile, caption, route, fileNa
 }
 
 module.exports = {
+  existWspGreen,
   deleteMessageGreen,
   sendMessageTextGreen,
   sendMessageMediaGreen,
