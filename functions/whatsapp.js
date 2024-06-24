@@ -48,6 +48,16 @@ const principalBody = (body) => {
   
     return {mobile, code, country}
   }
+
+  const mobileBodyRecived = (body) => {
+    let mobile = ''
+    let from = body && body.senderData && body.senderData.chatId && body.senderData.chatId.replace('@c.us', '')
+    from = from.charAt(0) === '+' ? from.substring(1) : from
+    const { code, country } = searchCodeNumber(from)
+    mobile = from
+  
+    return {mobile, code, country}
+  }
   
   const uploadBody = async (url, file, msgId) => {
     const positionEnd = url && url.lastIndexOf('.')
@@ -79,5 +89,6 @@ const principalBody = (body) => {
     messageBody,
     fileBody,
     mobileBody,
+    mobileBodyRecived,
     uploadBody
   }
