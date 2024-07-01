@@ -11,7 +11,7 @@ const principalBody = (body) => {
   }
   
   const messageBody = (body, typeMsg) => {
-    let msgBody = '', fileName = ''
+    let msgBody = '', fileName = '', contacts = []
   
     if (typeMsg === 'text') {
       msgBody = body && body.senderData && body.messageData.textMessageData && body.messageData.textMessageData.textMessage ? body.messageData.textMessageData.textMessage : ''
@@ -29,8 +29,35 @@ const principalBody = (body) => {
     } else if (typeMsg === 'audio') {
       msgBody = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.caption ? body.messageData.fileMessageData.caption : ''
       fileName = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.fileName ? body.messageData.fileMessageData.fileName : ''
+    } else if (typeMsg === 'contact' || typeMsg === 'contactsArray'){
+      if(typeMsg === 'contact') {
+        msgBody = ''
+        const names = body && body.messageData && body.messageData.contactMessageData && body.messageData.contactMessageData.displayName ? body.messageData.contactMessageData.displayName : ''
+        const vcard = body && body.messageData && body.messageData.contactMessageData && body.messageData.contactMessageData.displayName ? body.messageData.contactMessageData.vcard : ''
+        if (vcard) {
+          const indexFirst = vcard.indexOf('waid=')
+          const numberEnd = vcard.substring((indexFirst+5), vcard.length)
+          const number = numberEnd.substring(0, numberEnd.indexOf(":"))
+          contacts.push({mobile: number, names: names})
+        }
+      } else {
+        msgBody = ''
+        const contactsArray = body && body.messageData && body.messageData.messageData && body.messageData.messageData.contacts ? body.messageData.messageData.contacts : []
+        if(contactsArray && contactsArray.length) {
+          contactsArray.forEach(contact => {
+            const names = contact.displayName ? contact.displayName : ''
+            const vcard = contact.vcard ? contact.vcard : ''
+            if (vcard) {
+              const indexFirst = vcard.indexOf('waid=')
+              const numberEnd = vcard.substring((indexFirst+5), vcard.length)
+              const number = numberEnd.substring(0, numberEnd.indexOf(":"))
+              contacts.push({mobile: number, names: names})
+            }
+          })
+        }
+      }
     }
-    return {msgBody, fileName}
+    return {msgBody, fileName, contacts}
   }
   
   const fileBody = async (body, typeMsg) => {
