@@ -139,10 +139,39 @@ const setDocument = async (id, token, chat, message, file) => {
   }
 }
 
+const setAudio = async (id, token, chat, message, file) => {
+  try {
+    const response = await axios({
+      method: 'POST',
+      url: `https://graph.facebook.com/v17.0/${id}/messages`,
+      data: {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: chat.mobileCode + chat.mobile,
+        type: 'audio',
+        document: {
+          link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
+          caption: message
+        }
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    return response
+  } catch (error) {
+    console.log('error', error)
+  }
+}
+
+
 module.exports = {
   getMedia,
   setMessage,
   setImage,
   setVideo,
-  setDocument
+  setDocument,
+  setAudio
 }

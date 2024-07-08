@@ -94,7 +94,7 @@ const principalBody = (body) => {
     if (file) {
       route = await saveFileHookAws(file, `${msgId}.${extension}`)
     }
-  
+    // console.log('route', route)
     return route
   }
 

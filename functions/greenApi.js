@@ -82,6 +82,25 @@ const sendMessageMediaGreen = async (idInstance, token, chatId, url, filename = 
   }
 }
 
+const uploadediaGreen = async (idInstance, token, file) => {
+  try {
+    const resp = await axios({
+      method: 'POST',
+      url: `https://media.green-api.com/waInstance${idInstance}/uploadFile/${token}`,
+      data: {
+        file: file
+      },
+      headers: {
+        'Content-Type': 'audio/mp3'
+      }
+    })
+    // console.log('resp', resp)
+    return resp
+  } catch (error) {
+    throw error
+  }
+}
+
 const sendGreenClient = async (idInstance, token, mobile, caption, route, fileName, typeMessage) => {
   let response
   const restAPI = whatsAppClient.restAPI(({
@@ -101,5 +120,32 @@ module.exports = {
   deleteMessageGreen,
   sendMessageTextGreen,
   sendMessageMediaGreen,
-  sendGreenClient
+  sendGreenClient,
+  uploadediaGreen
 }
+
+
+// console.log('filerootReplace', fs.createReadStream(`${SERVER_PATH}${filerootReplace}`))
+        // let resp 
+        // try {
+        //   resp = await axios({
+        //     method: 'POST',
+        //     url: `https://media.green-api.com/waInstance${connection.idInstance}/uploadFile/${connection.key}`,
+        //     data: fs.createReadStream(`${SERVER_PATH}${filerootReplace}`),
+        //     headers: {
+        //       'Content-Type': 'audio/mpeg'
+        //     }
+        //   })
+        //   console.log('resp', resp)
+        //   // return resp
+        // } catch (error) {
+        //   console.log('error', error)
+        //   throw error
+        // }
+        // const data = await sendMessageMediaGreen(
+        //   connection.idInstance, connection.key,
+        //   chat.mobile, body.resend ? body.url : resp.data.urlFile,
+        //   'audio.mp3',
+        //   body.text, file
+        // )
+        // wamid = data && data.data && data.data.idMessage
