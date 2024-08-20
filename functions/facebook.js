@@ -13,7 +13,7 @@ const sendMessageTextFacebook  = async (pageAccessToken, recipientId, messageTex
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v20.0/me/messages`,
+      url: `https://graph.facebook.com/v20.0/1811506018901320/messages`,
       params: {
         access_token: pageAccessToken
       },
@@ -23,15 +23,19 @@ const sendMessageTextFacebook  = async (pageAccessToken, recipientId, messageTex
         },
         message: {
           text: messageText
-        }
+        },
+        messaging_type: 'RESPONSE',
+        access_token: pageAccessToken
       },
       headers: {
         'Content-Type': 'application/json'
       }
     })
-    // console.log('resp', resp)
+    console.log('resp', resp)
     return resp
   } catch (error) {
+    console.log('error', error.response.data)
+    console.log('error', error.response.data.error)
     throw error
   }
 }

@@ -4,6 +4,10 @@ const listConnections = async params => {
   return get('/connection', params)
 }
 
+const setConnectionFB = async params => {
+  return get('/connection/fb', params)
+}
+
 const createConnection = async data => {
   return post('/connection', data)
 }
@@ -26,6 +30,7 @@ const removeConnection = async id => {
 
 module.exports = {
   listConnections,
+  setConnectionFB,
   createConnection,
   updateConnection,
   detailConnection,
