@@ -62,7 +62,7 @@ const principalBody = (body) => {
   
   const fileBody = async (body, typeMsg) => {
     const url = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.downloadUrl
-    const file = (typeMsg === 'image' || typeMsg === 'video' || typeMsg === 'document' || typeMsg === 'audio') ? await getFile(url) : ''
+    const file = (typeMsg === 'image' || typeMsg === 'video' || typeMsg === 'document' || typeMsg === 'audio' || typeMsg === 'sticker' ) ? await getFile(url) : ''
     return {file, url}
   }
   
