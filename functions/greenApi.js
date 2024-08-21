@@ -5,7 +5,7 @@ const existWspGreen = async (idInstance, token, mobile) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://7103.api.greenapi.com/waInstance${idInstance}/checkWhatsapp/${token}`,
+      url: `https://api.greenapi.com/waInstance${idInstance}/checkWhatsapp/${token}`,
       data: {
         phoneNumber: parseInt(mobile)
       },
@@ -24,7 +24,7 @@ const deleteMessageGreen = async (idInstance, token, chatId, idMessage) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://7103.api.greenapi.com/waInstance${idInstance}/deleteMessage/${token}`,
+      url: `https://api.greenapi.com/waInstance${idInstance}/deleteMessage/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         idMessage: idMessage
@@ -44,7 +44,7 @@ const sendMessageTextGreen = async (idInstance, token, chatId, text) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://7103.api.greenapi.com/waInstance${idInstance}/sendMessage/${token}`,
+      url: `https://api.greenapi.com/waInstance${idInstance}/sendMessage/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         message: text
@@ -65,7 +65,7 @@ const sendMessageMediaGreen = async (idInstance, token, chatId, url, filename = 
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://7103.api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${token}`,
+      url: `https://api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         urlFile: url,
