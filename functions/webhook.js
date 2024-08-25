@@ -24,7 +24,7 @@ const sendTextWebhook = async (connection, mobile, message, url, mood) => {
     }
 }
 
-const sendMediaWebhook = async (connection, typeMsg, mobile, message, fileName, file, url, mood) => {
+const sendMediaWebhook = async (connection, typeMsg, mobileCode, mobile, message, fileName, file, url, mood) => {
     try {
         const resp = await axios({
             method: 'POST',
@@ -32,6 +32,7 @@ const sendMediaWebhook = async (connection, typeMsg, mobile, message, fileName, 
             data: {
                 connection: connection,
                 typeMessage: typeMsg,
+                mobileCode: mobileCode,
                 mobile: mobile,
                 caption: message,
                 fileName: fileName ? fileName : '',

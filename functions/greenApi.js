@@ -53,10 +53,10 @@ const sendMessageTextGreen = async (idInstance, token, chatId, text) => {
         'Content-Type': 'application/json'
       }
     })
-    // console.log('resp', resp)
+    console.log('resp', resp)
     return resp
   } catch (error) {
-    // console.log('error', error)
+    console.log('error', error)
     throw error
   }
 }
