@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const sendTextWebhook = async (connection, mobile, message, url, mood) => {
+const sendTextWebhook = async (connection, mobileCode, mobile, message, url, mood) => {
     try {
         const resp = await axios({
             method: 'POST',
@@ -8,6 +8,7 @@ const sendTextWebhook = async (connection, mobile, message, url, mood) => {
             data: {
                 connection: connection,
                 typeMessage: 'text',
+                mobileCode: mobileCode,
                 mobile: mobile,
                 caption: message,
                 mood: mood
