@@ -17,6 +17,9 @@ const principalBody = (body) => {
       msgBody = body && body.senderData && body.messageData.textMessageData && body.messageData.textMessageData.textMessage ? body.messageData.textMessageData.textMessage : ''
     } else if (typeMsg === 'extendedText' || typeMsg === 'quoted') {
       msgBody = body && body.messageData && body.messageData.extendedTextMessageData && body.messageData.extendedTextMessageData.text ? body.messageData.extendedTextMessageData.text : ''
+    } else if (typeMsg === 'reaction') {
+      msgBody = body && body.messageData && body.messageData.extendedTextMessageData && body.messageData.extendedTextMessageData.text ? body.messageData.extendedTextMessageData.text : ''
+      fileName = body && body.messageData && body.messageData.quotedMessage && body.messageData.quotedMessage.stanzaId ? body.messageData.quotedMessage.stanzaId : ''
     } else if (typeMsg === 'image') {
       msgBody = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.caption ? body.messageData.fileMessageData.caption : ''
       fileName = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.fileName ? body.messageData.fileMessageData.fileName : ''
