@@ -61,6 +61,28 @@ const sendMessageTextGreen = async (idInstance, token, chatId, text) => {
   }
 }
 
+const sendMessageTextQuotedGreen = async (idInstance, token, chatId, text, quotedMessageId) => {
+  try {
+    const resp = await axios({
+      method: 'POST',
+      url: `https://api.greenapi.com/waInstance${idInstance}/sendMessage/${token}`,
+      data: {
+        chatId: `${chatId}@c.us`,
+        message: text,
+        quotedMessageId: quotedMessageId
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    console.log('resp', resp)
+    return resp
+  } catch (error) {
+    console.log('error', error)
+    throw error
+  }
+}
+
 const sendMessageMediaGreen = async (idInstance, token, chatId, url, filename = '', caption = '') => {
   try {
     const resp = await axios({
@@ -71,6 +93,29 @@ const sendMessageMediaGreen = async (idInstance, token, chatId, url, filename = 
         urlFile: url,
         fileName: filename,
         caption: caption
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    // console.log('resp', resp)
+    return resp
+  } catch (error) {
+    throw error
+  }
+}
+
+const sendMessageMediaQuotedGreen = async (idInstance, token, chatId, url, filename = '', caption = '', quotedMessageId = '') => {
+  try {
+    const resp = await axios({
+      method: 'POST',
+      url: `https://api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${token}`,
+      data: {
+        chatId: `${chatId}@c.us`,
+        urlFile: url,
+        fileName: filename,
+        caption: caption,
+        quotedMessageId: quotedMessageId
       },
       headers: {
         'Content-Type': 'application/json'
@@ -120,7 +165,9 @@ module.exports = {
   existWspGreen,
   deleteMessageGreen,
   sendMessageTextGreen,
+  sendMessageTextQuotedGreen,
   sendMessageMediaGreen,
+  sendMessageMediaQuotedGreen,
   sendGreenClient,
   uploadediaGreen
 }
