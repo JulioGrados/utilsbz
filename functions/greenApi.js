@@ -128,6 +128,25 @@ const sendMessageMediaQuotedGreen = async (idInstance, token, chatId, url, filen
   }
 }
 
+const sendMarkReadGreen = async (idInstance, token, chatId) => {
+  try {
+    const resp = await axios({
+      method: 'POST',
+      url: `https://api.greenapi.com/waInstance${idInstance}/readChat/${token}`,
+      data: {
+        chatId: `${chatId}@c.us`
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    // console.log('resp', resp)
+    return resp
+  } catch (error) {
+    throw error
+  }
+}
+
 const uploadediaGreen = async (idInstance, token, file) => {
   try {
     const resp = await axios({
@@ -168,32 +187,7 @@ module.exports = {
   sendMessageTextQuotedGreen,
   sendMessageMediaGreen,
   sendMessageMediaQuotedGreen,
+  sendMarkReadGreen,
   sendGreenClient,
   uploadediaGreen
 }
-
-
-// console.log('filerootReplace', fs.createReadStream(`${SERVER_PATH}${filerootReplace}`))
-        // let resp 
-        // try {
-        //   resp = await axios({
-        //     method: 'POST',
-        //     url: `https://media.green-api.com/waInstance${connection.idInstance}/uploadFile/${connection.key}`,
-        //     data: fs.createReadStream(`${SERVER_PATH}${filerootReplace}`),
-        //     headers: {
-        //       'Content-Type': 'audio/mpeg'
-        //     }
-        //   })
-        //   console.log('resp', resp)
-        //   // return resp
-        // } catch (error) {
-        //   console.log('error', error)
-        //   throw error
-        // }
-        // const data = await sendMessageMediaGreen(
-        //   connection.idInstance, connection.key,
-        //   chat.mobile, body.resend ? body.url : resp.data.urlFile,
-        //   'audio.mp3',
-        //   body.text, file
-        // )
-        // wamid = data && data.data && data.data.idMessage
