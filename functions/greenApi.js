@@ -166,6 +166,25 @@ const uploadediaGreen = async (idInstance, token, file) => {
   }
 }
 
+const getAvatarGreen = async (idInstance, token, chatId) => {
+  try {
+    const resp = await axios({
+      method: 'POST',
+      url: `https://media.green-api.com/waInstance${idInstance}/getAvatar/${token}`,
+      data: {
+        chatId: chatId
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    // console.log('resp', resp)
+    return resp
+  } catch (error) {
+    throw error
+  }
+}
+
 const sendGreenClient = async (idInstance, token, mobile, caption, route, fileName, typeMessage) => {
   let response
   const restAPI = whatsAppClient.restAPI(({
@@ -189,5 +208,6 @@ module.exports = {
   sendMessageMediaQuotedGreen,
   sendMarkReadGreen,
   sendGreenClient,
-  uploadediaGreen
+  uploadediaGreen,
+  getAvatarGreen
 }
