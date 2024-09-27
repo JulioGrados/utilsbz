@@ -170,7 +170,7 @@ const getAvatarGreen = async (idInstance, token, chatId) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://media.green-api.com/waInstance${idInstance}/getAvatar/${token}`,
+      url: `https://api.greenapi.com/waInstance${idInstance}/getAvatar/${token}`,
       data: {
         chatId: `${chatId}@c.us`
       },
@@ -181,6 +181,7 @@ const getAvatarGreen = async (idInstance, token, chatId) => {
     // console.log('resp', resp)
     return resp
   } catch (error) {
+    console.log('error', error)
     throw error
   }
 }
