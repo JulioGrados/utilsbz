@@ -172,7 +172,7 @@ const getAvatarGreen = async (idInstance, token, chatId) => {
       method: 'POST',
       url: `https://media.green-api.com/waInstance${idInstance}/getAvatar/${token}`,
       data: {
-        chatId: chatId
+        chatId: `${chatId}@c.us`
       },
       headers: {
         'Content-Type': 'application/json'
