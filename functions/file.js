@@ -7,6 +7,15 @@ const getFile = async (url) => {
   return response.data
 }
 
+const getFileData = async (url) => {
+  const response = await axios.get(url, {
+      responseType: 'arraybuffer'
+  })
+  return response
+}
+
+
 module.exports = {
-  getFile
+  getFile,
+  getFileData
 }
