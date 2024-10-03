@@ -181,7 +181,7 @@ const getAvatarGreen = async (idInstance, token, chatId) => {
     // console.log('resp', resp)
     return resp
   } catch (error) {
-    console.log('error', error)
+    // console.log('error', error)
     throw error
   }
 }
