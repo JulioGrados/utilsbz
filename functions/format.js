@@ -1,4 +1,4 @@
-const FormatText = (text) => {
+const FormatText = (text = "") => {
   const boldRegex = /(?<=\s|^)\*(.*?)\*(?=\s|$)/g;
   const italicRegex = /(?<=\s|^)_(.*?)_(?=\s|$)/g;
   const striketroughRegex = /(?<=\s|^)~(.*?)~(?=\s|$)/g;
