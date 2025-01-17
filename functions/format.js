@@ -1,18 +1,13 @@
-const FormatText = (text) => {
-  const boldRegex = /\*(.*?)\*/g;
-  const italicRegex = /\_(.*?)\_/g;
-  const striketroughRegex = /\~(.*?)\~/g;
+const FormatText = (text = "") => {
+  const boldRegex = /(?<=\s|^)\*(.*?)\*(?=\s|$)/g;
+  const italicRegex = /(?<=\s|^)_(.*?)_(?=\s|$)/g;
+  const striketroughRegex = /(?<=\s|^)~(.*?)~(?=\s|$)/g;
   
   const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
-  
   const urlRegex = /\b((https?:\/\/|www\.)\S+)\b/gi;
 
-  //formateo de negrita, cursiva y tachado
-  let formattedText = text.replace(boldRegex, "<b>$1</b>")
-                          .replace(italicRegex, "<i>$1</i>")
-                          .replace(striketroughRegex, "<s>$1</s>");
-
-  // Reemplazo de URLs
+  // Reemplazo de URLs primero
+  let formattedText = text;
   const urlMatches = formattedText.match(urlRegex);
   if (urlMatches && urlMatches.length) {
     urlMatches.forEach((item) => {
@@ -28,6 +23,11 @@ const FormatText = (text) => {
       formattedText = formattedText.replace(item, `<a href="mailto:${item}">${item}</a>`);
     });
   }
+
+  // Formateo de negrita, cursiva y tachado
+  formattedText = formattedText.replace(boldRegex, "<b>$1</b>")
+                               .replace(italicRegex, "<i>$1</i>")
+                               .replace(striketroughRegex, "<s>$1</s>");
 
   return formattedText;
 };
