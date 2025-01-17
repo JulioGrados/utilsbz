@@ -82,7 +82,148 @@ const sendMessageMediaFacebook = async (pageAccessToken, recipientId, url, messa
   }
 }
 
+// Funciones Facebook, proyecto brasil
+const getPageProfile = async (id, token) => {
+  console.log('id', id)
+  console.log('token', token)
+  try {
+      const accountsResponse = await axios.get(`https://graph.facebook.com/v16.0/me/accounts`, {
+        params: {
+          access_token: token,
+        }
+      })
+      console.log('accountsResponse.data.data', accountsResponse)
+      return accountsResponse.data.data
+  }
+  catch (error) {
+      console.log(error.response.data.error);
+      throw error
+  }
+};
+
+const getAccessTokenFromPage = async (token) => {
+  try {
+    const data = await axios.get("https://graph.facebook.com/v13.0/oauth/access_token", {
+        params: {
+            client_id: appId,
+            client_secret: appSecret,
+            grant_type: "fb_exchange_token",
+            fb_exchange_token: token
+        }
+    });
+    console.log('data', data)
+    return data.data.access_token;
+  }
+  catch (error) {
+    throw error
+  }
+}
+
+const subscribeApp = async (id, token) => {
+  try {
+      const { data } = await axios.post(`https://graph.facebook.com/v13.0/${id}/subscribed_apps?access_token=${token}`, {
+          subscribed_fields: [
+              "messages",
+              "messaging_postbacks",
+              "message_deliveries",
+              "message_reads",
+              "message_echoes"
+          ]
+      });
+      console.log('sus data', data);
+      return data;
+  }
+  catch (error) {
+      throw error;
+  }
+}
+
+//eventos de facebook cuando se envie un mensaje 
+const apiBase = (token) => axios.create({
+  baseURL: "https://graph.facebook.com/v13.0/",
+  params: {
+      access_token: token
+  }
+});
+
+const markSeen = async (id, token) => {
+  await apiBase(token).post(`${id}/messages`, {
+      recipient: {
+          id
+      },
+      sender_action: "mark_seen"
+  });
+};
+
+const sendText = async (id, text, token) => {
+  try {
+      const { data } = await apiBase(token).post("me/messages", {
+          recipient: {
+              id
+          },
+          message: {
+              text: `${text}`
+          }
+      });
+      return data;
+  }
+  catch (error) {
+      console.log(error);
+  }
+};
+
+const sendAttachmentFromUrl = async (id, url, type, token) => {
+  try {
+      const { data } = await apiBase(token).post("me/messages", {
+          recipient: {
+              id
+          },
+          message: {
+              attachment: {
+                  type: type,
+                  payload: {
+                      url
+                  }
+              }
+          }
+      });
+      return data;
+  }
+  catch (error) {
+      console.log(error);
+  }
+};
+
+const sendAttachment = async (id, file, type, token) => {
+  formData.append("recipient", JSON.stringify({
+      id
+  }));
+  formData.append("message", JSON.stringify({
+      attachment: {
+          type: type,
+          payload: {
+              is_reusable: true
+          }
+      }
+  }));
+  let fileReaderStream = (0, fs_1.createReadStream)(file.path);
+  formData.append("filedata", fileReaderStream);
+  try {
+      await apiBase(token).post("me/messages", formData, {
+          headers: {
+              ...formData.getHeaders()
+          }
+      });
+  }
+  catch (error) {
+      throw new AppError_1.default(error);
+  }
+};
+
 module.exports = {
   sendMessageTextFacebook,
   sendMessageMediaFacebook,
+  getPageProfile,
+  getAccessTokenFromPage,
+  subscribeApp
 }

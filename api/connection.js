@@ -4,8 +4,8 @@ const listConnections = async params => {
   return get('/connection', params)
 }
 
-const setConnectionFB = async params => {
-  return get('/connection/fb', params)
+const setConnectionFB = async data => {
+  return post('/connection/fb', data)
 }
 
 const createConnection = async data => {
