@@ -101,7 +101,7 @@ const getPageProfile = async (id, token) => {
   }
 };
 
-const getAccessTokenFromPage = async (token) => {
+const getAccessTokenFromPage = async (appId, appSecret, token) => {
   try {
     const data = await axios.get("https://graph.facebook.com/v13.0/oauth/access_token", {
         params: {
