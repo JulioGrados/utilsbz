@@ -146,6 +146,33 @@ const apiBase = (token) => axios.create({
   }
 });
 
+const getProfile = async (id, token) => {
+  try {
+      const { data } = await apiBase(token).get(id);
+      return data;
+  }
+  catch (error) {
+      console.log(error);
+      console.log(id);
+      throw error;
+  }
+};
+const profilePsid = async (id, token) => {
+  try {
+      const { data } = await axios.get(`https://graph.facebook.com/v13.0/${id}?access_token=${token}`);
+      return data;
+  }
+  catch (error) {
+      console.log(error);
+      try {
+        const data = await getProfile(id, token);
+        return data;
+      } catch (error) {
+        throw error
+      }
+  }
+};
+
 const markSeen = async (id, token) => {
   await apiBase(token).post(`${id}/messages`, {
       recipient: {
@@ -225,5 +252,6 @@ module.exports = {
   sendMessageMediaFacebook,
   getPageProfile,
   getAccessTokenFromPage,
-  subscribeApp
+  subscribeApp,
+  profilePsid
 }
