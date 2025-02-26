@@ -8,6 +8,10 @@ const createContact = async data => {
   return post('/contact', data)
 }
 
+const createOpenContacts = async data => {
+  return post('/open/contact/upload', data)
+}
+
 const detailContact = async (id, params, jwt) => {
   return getOne(`/contact/${id}`, params, jwt)
 }
@@ -23,6 +27,7 @@ const removeContact = async id => {
 module.exports = {
   listContacts,
   createContact,
+  createOpenContacts,
   updateContact,
   detailContact,
   removeContact
