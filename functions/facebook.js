@@ -174,12 +174,29 @@ const profilePsid = async (id, token) => {
 };
 
 const markSeen = async (id, token) => {
-  await apiBase(token).post(`${id}/messages`, {
-      recipient: {
-          id
-      },
-      sender_action: "mark_seen"
-  });
+  // await apiBase(token).post(`${id}/messages`, {
+  //     recipient: {
+  //         id
+  //     },
+  //     sender_action: "mark_seen"
+  // });
+  try {
+    const url = `https://graph.facebook.com/v13.0/me/messages?access_token=${token}`;
+
+    const payload = {
+        recipient: { id: id },
+        sender_action: "mark_seen"
+    };
+
+    const response = await axios.post(url, payload, {
+        headers: { "Content-Type": "application/json" }
+    });
+
+    console.log("Mensaje marcado como visto:", response.data);
+    return response.data;
+  } catch (error) {
+      console.error("Error al marcar el mensaje como visto:", error.response?.data || error.message);
+  }
 };
 
 const sendText = async (id, text, token) => {
