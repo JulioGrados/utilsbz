@@ -253,5 +253,9 @@ module.exports = {
   getPageProfile,
   getAccessTokenFromPage,
   subscribeApp,
-  profilePsid
+  profilePsid,
+  markSeen,
+  sendText,
+  sendAttachmentFromUrl,
+  sendAttachment
 }
