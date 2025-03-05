@@ -256,7 +256,7 @@ const sendAttachmentFromUrl = async (id, file, type, token) => {
         type: type, // Puede ser "image", "video", "audio" o "file"
         payload: {
           url: file,
-          is_reusable: true // Permite reutilizar el archivo
+          is_reusable: false // Permite reutilizar el archivo
         }
       }
     }
