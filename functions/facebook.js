@@ -174,12 +174,6 @@ const profilePsid = async (id, token) => {
 };
 
 const markSeen = async (id, token) => {
-  // await apiBase(token).post(`${id}/messages`, {
-  //     recipient: {
-  //         id
-  //     },
-  //     sender_action: "mark_seen"
-  // });
   try {
     const url = `https://graph.facebook.com/v13.0/me/messages?access_token=${token}`;
 
@@ -200,19 +194,36 @@ const markSeen = async (id, token) => {
 };
 
 const sendText = async (id, text, token) => {
+  // try {
+  //     const { data } = await apiBase(token).post("me/messages", {
+  //         recipient: {
+  //             id
+  //         },
+  //         message: {
+  //             text: `${text}`
+  //         }
+  //     });
+  //     return data;
+  // }
+  // catch (error) {
+  //     console.log(error);
+  // }
+  const url = `https://graph.facebook.com/v13.0/me/messages?access_token=${token}`;
+
+  const messageData = {
+    recipient: { id: id },
+    message: { text: text }
+  };
+
   try {
-      const { data } = await apiBase(token).post("me/messages", {
-          recipient: {
-              id
-          },
-          message: {
-              text: `${text}`
-          }
-      });
-      return data;
-  }
-  catch (error) {
-      console.log(error);
+    const response = await axios.post(url, messageData, {
+      headers: { "Content-Type": "application/json" }
+    });
+    console.log("Mensaje enviado:", response.data);
+    return response.data
+  } catch (error) {
+    console.error("Error enviando mensaje:", error.response ? error.response.data : error);
+    throw error.response ? error.response.data : error
   }
 };
 
