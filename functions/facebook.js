@@ -227,7 +227,7 @@ const sendText = async (id, text, token) => {
   }
 };
 
-const sendAttachmentFromUrl = async (id, url, type, token) => {
+const sendAttachmentFromUrl = async (id, file, type, token) => {
   // try {
   //     const { data } = await apiBase(token).post("me/messages", {
   //         recipient: {
@@ -255,7 +255,7 @@ const sendAttachmentFromUrl = async (id, url, type, token) => {
       attachment: {
         type: type, // Puede ser "image", "video", "audio" o "file"
         payload: {
-          url: FILE_URL,
+          url: file,
           is_reusable: true // Permite reutilizar el archivo
         }
       }
