@@ -274,84 +274,62 @@ const sendAttachmentFromUrl = async (id, file, type, token) => {
   }
 };
 
-const uploadImage = async (file, token) => {
-  const url = `https://graph.facebook.com/v18.0/me/message_attachments?access_token=${token}`;
-
-  const data = {
-      message: {
-          attachment: {
-              type: "image",
-              payload: {
-                  url: file,
-                  is_reusable: false
-              }
-          }
-      }
-  };
-
-  try {
-      const response = await axios.post(url, data, {
-          headers: { "Content-Type": "application/json" }
-      });
-      console.log("Imagen subida con éxito:", response.data);
-      return response.data.attachment_id;
-  } catch (error) {
-      console.error("Error subiendo imagen:", error.response ? error.response.data : error);
-      throw error.response ? error.response.data : error
-  }
-};
-
-const sendImageById = async (attachmentId, token, id) => {
-  const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${token}`;
-
-  const messageData = {
-      recipient: { id: id },
-      message: {
-          attachment: {
-              type: "image",
-              payload: {
-                  attachment_id: attachmentId
-              }
-          }
-      }
-  };
-
-  try {
-      const response = await axios.post(url, messageData, {
-          headers: { "Content-Type": "application/json" }
-      });
-      console.log("Imagen enviada con attachment_id:", response.data);
-      return response.data
-  } catch (error) {
-      console.error("Error enviando imagen:", error.response ? error.response.data : error);
-      throw error.response ? error.response.data : error
-  }
-};
-
-
 const sendAttachment = async (id, file, type, token) => {
+  // formData.append("recipient", JSON.stringify({
+  //     id
+  // }));
+  // formData.append("message", JSON.stringify({
+  //     attachment: {
+  //         type: type,
+  //         payload: {
+  //             is_reusable: true
+  //         }
+  //     }
+  // }));
+  // let fileReaderStream = (0, fs_1.createReadStream)(file.path);
+  // formData.append("filedata", fileReaderStream);
+  // try {
+  //     await apiBase(token).post("me/messages", formData, {
+  //         headers: {
+  //             ...formData.getHeaders()
+  //         }
+  //     });
+  // }
+  // catch (error) {
+  //     throw new AppError_1.default(error);
+  // }
+  const url = `https://graph.facebook.com/v13.0/me/message_attachments?access_token=${token}`;
+
+    // Crear un objeto FormData
+  const form = new FormData();
   formData.append("recipient", JSON.stringify({
-      id
+    id
   }));
-  formData.append("message", JSON.stringify({
-      attachment: {
-          type: type,
-          payload: {
-              is_reusable: true
-          }
-      }
+  form.append('message', JSON.stringify({
+    attachment: {
+      type: type,
+      payload: { is_reusable: false }
+    }
   }));
-  let fileReaderStream = (0, fs_1.createReadStream)(file.path);
-  formData.append("filedata", fileReaderStream);
+  form.append('filedata', file.data, { filename: file.name, contentType: file.mimetype });
+
   try {
-      await apiBase(token).post("me/messages", formData, {
-          headers: {
-              ...formData.getHeaders()
-          }
-      });
-  }
-  catch (error) {
-      throw new AppError_1.default(error);
+      // Enviar la imagen a Facebook
+    const response = await axios.post(url, form, {
+      headers: { 
+        ...form.getHeaders() // Configurar los encabezados correctamente
+      }
+    });
+
+    console.log("Imagen subida con éxito:", response.data);
+    // const attachmentId = response.data.attachment_id;
+
+    // // Enviar la imagen al usuario con el attachment_id obtenido
+    // await sendImageById(attachmentId);
+    return response.data
+  } catch (error) {
+    console.error("Error enviando imagen:", error.response ? error.response.data : error);
+    throw error.response ? error.response.data : error
   }
 };
 
