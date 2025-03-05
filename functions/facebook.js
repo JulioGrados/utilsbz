@@ -343,7 +343,5 @@ module.exports = {
   markSeen,
   sendText,
   sendAttachmentFromUrl,
-  sendAttachment,
-  uploadImage,
-  sendImageById
+  sendAttachment
 }
