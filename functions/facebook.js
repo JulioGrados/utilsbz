@@ -302,7 +302,7 @@ const sendAttachment = async (id, file, type, token) => {
 
     // Crear un objeto FormData
   const form = new FormData();
-  formData.append("recipient", JSON.stringify({
+  form.append("recipient", JSON.stringify({
     id
   }));
   form.append('message', JSON.stringify({
