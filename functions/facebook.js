@@ -1,4 +1,5 @@
 const axios = require('axios')
+var FormData = require('form-data');
 
 //Nota: las mismas funciones se utilizan para instagram; solo se debe indicar el recipientId del usuario
 
