@@ -276,40 +276,13 @@ const sendAttachmentFromUrl = async (id, file, type, token) => {
 };
 
 const sendAttachment = async (id, file, type, token) => {
-  // formData.append("recipient", JSON.stringify({
-  //     id
-  // }));
-  // formData.append("message", JSON.stringify({
-  //     attachment: {
-  //         type: type,
-  //         payload: {
-  //             is_reusable: true
-  //         }
-  //     }
-  // }));
-  // let fileReaderStream = (0, fs_1.createReadStream)(file.path);
-  // formData.append("filedata", fileReaderStream);
-  // try {
-  //     await apiBase(token).post("me/messages", formData, {
-  //         headers: {
-  //             ...formData.getHeaders()
-  //         }
-  //     });
-  // }
-  // catch (error) {
-  //     throw new AppError_1.default(error);
-  // }
   console.log('file', file)
   const url = `https://graph.facebook.com/v18.0/me/message_attachments?access_token=${token}`;
 
-  // Leer la imagen como Buffer
-  // const imageBuffer = fs.readFileSync(IMAGE_PATH);
   const form = new FormData();
-
-  // Agregar la información del mensaje en formato JSON
   form.append('message', JSON.stringify({
     attachment: {
-      type: "image",
+      type: type,
       payload: { is_reusable: false }
     }
   }));
