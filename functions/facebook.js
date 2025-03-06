@@ -298,34 +298,63 @@ const sendAttachment = async (id, file, type, token) => {
   // catch (error) {
   //     throw new AppError_1.default(error);
   // }
-  const url = `https://graph.facebook.com/v13.0/me/message_attachments?access_token=${token}`;
+  console.log('file', file)
+  const url = `https://graph.facebook.com/v18.0/me/message_attachments?access_token=${token}`;
 
-    // Crear un objeto FormData
+  // Leer la imagen como Buffer
+  // const imageBuffer = fs.readFileSync(IMAGE_PATH);
   const form = new FormData();
-  form.append("recipient", JSON.stringify({
-    id
-  }));
+
+  // Agregar la información del mensaje en formato JSON
   form.append('message', JSON.stringify({
     attachment: {
-      type: type,
+      type: "image",
       payload: { is_reusable: false }
     }
   }));
+
+  // Agregar la imagen como Buffer
   form.append('filedata', file.data, { filename: file.name, contentType: file.mimetype });
 
   try {
       // Enviar la imagen a Facebook
     const response = await axios.post(url, form, {
       headers: { 
-        ...form.getHeaders() // Configurar los encabezados correctamente
+        ...form.getHeaders() // Agregar los headers correctos
       }
     });
 
     console.log("Imagen subida con éxito:", response.data);
-    // const attachmentId = response.data.attachment_id;
+    const attachmentId = response.data.attachment_id;
 
-    // // Enviar la imagen al usuario con el attachment_id obtenido
-    // await sendImageById(attachmentId);
+      // Enviar la imagen al usuario con el attachment_id obtenido
+    return  await sendImageById(attachmentId, token, id);
+  } catch (error) {
+    console.error("Error enviando imagen:", error.response ? error.response.data : error);
+    throw error.response ? error.response.data : error
+  }
+};
+
+const sendImageById = async (attachmentId, token, id) => {
+  const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${token}`;
+
+  const messageData = {
+    recipient: { id: id },
+    message: {
+      attachment: {
+        type: "image",
+        payload: {
+          attachment_id: attachmentId
+        }
+      }
+    }
+  };
+
+  try {
+    const response = await axios.post(url, messageData, {
+      headers: { "Content-Type": "application/json" }
+    });
+    console.log("Imagen enviada con attachment_id:", response.data);
     return response.data
   } catch (error) {
     console.error("Error enviando imagen:", error.response ? error.response.data : error);
