@@ -302,21 +302,21 @@ const sendAttachment = async (id, file, type, token) => {
     const attachmentId = response.data.attachment_id;
 
       // Enviar la imagen al usuario con el attachment_id obtenido
-    return  await sendImageById(attachmentId, token, id);
+    return  await sendImageById(attachmentId, token, id, type);
   } catch (error) {
     console.error("Error enviando imagen:", error.response ? error.response.data : error);
     throw error.response ? error.response.data : error
   }
 };
 
-const sendImageById = async (attachmentId, token, id) => {
+const sendImageById = async (attachmentId, token, id, type) => {
   const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${token}`;
 
   const messageData = {
     recipient: { id: id },
     message: {
       attachment: {
-        type: "image",
+        type: type,
         payload: {
           attachment_id: attachmentId
         }
