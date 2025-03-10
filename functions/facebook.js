@@ -158,21 +158,20 @@ const getProfile = async (id, token) => {
       throw error;
   }
 };
+
 const profilePsid = async (id, token) => {
   try {
       const { data } = await axios.get(`https://graph.facebook.com/v13.0/${id}?access_token=${token}`);
-      console.log('data', data)
       return data;
   }
   catch (error) {
-      // console.log(error);
-      // try {
-      //   const data = await getProfile(id, token);
-      //   return data;
-      // } catch (error) {
-      //   throw error
-      // }
-      throw error
+    const data = {
+      first_name: id,
+      last_name: id,
+      profile_pic: '',
+      id: id
+    }
+    return data;
   }
 };
 
