@@ -2,6 +2,7 @@
 
 const csvParser = require("csv-parser");
 const { Readable } = require("stream");
+const iconv = require("iconv-lite");
 
 const parseCSV = async (buffer) => {
     return new Promise((resolve, reject) => {
