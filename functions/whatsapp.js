@@ -85,7 +85,7 @@ const mobileBody = (body) => {
   let from = body && body.senderData && body.senderData.chatId && body.senderData.sender.replace('@c.us', '')
   from = from.charAt(0) === '+' ? from.substring(1) : from
   let { code, country } = searchCodeNumber(from)
-  code = code === '52' ? '521' : code
+  code = (code === '52') ? '521' : code
   mobile = from
 
   return {mobile, code, country}
@@ -95,8 +95,8 @@ const mobileBodyRecived = (body) => {
   let mobile = ''
   let from = body && body.senderData && body.senderData.chatId && body.senderData.chatId.replace('@c.us', '')
   from = from.charAt(0) === '+' ? from.substring(1) : from
-  const { code, country } = searchCodeNumber(from)
-  code = code === '52' ? '521' : code
+  let { code, country } = searchCodeNumber(from)
+  code = (code === '52') ? '521' : code
   mobile = from
 
   return {mobile, code, country}
