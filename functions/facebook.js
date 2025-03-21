@@ -122,10 +122,11 @@ const getAccessTokenFromPage = async (appId, appSecret, token) => {
 
 const subscribeApp = async (id, token) => {
   try {
-      const { data } = await axios.post(`https://graph.facebook.com/v13.0/${id}/subscribed_apps?access_token=${token}`, {
+      const { data } = await axios.post(https://graph.facebook.com/v13.0/${id}/subscribed_apps?access_token=${token}, {
           subscribed_fields: [
               "messages",
               "messaging_postbacks",
+              "message_reactions",
               "message_deliveries",
               "message_reads",
               "message_echoes"
@@ -135,8 +136,8 @@ const subscribeApp = async (id, token) => {
       return data;
   }
   catch (error) {
-      throw error;
-  }
+      throw error;
+  }
 }
 
 //eventos de facebook cuando se envie un mensaje 
