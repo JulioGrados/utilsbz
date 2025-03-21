@@ -126,6 +126,7 @@ const subscribeApp = async (id, token) => {
           subscribed_fields: [
               "messages",
               "messaging_postbacks",
+              "message_reactions",
               "message_deliveries",
               "message_reads",
               "message_echoes"
