@@ -8,6 +8,10 @@ const setConnectionFB = async data => {
   return post('/connection/fb', data)
 }
 
+const setConnectionIG = async data => {
+  return post('/connection/ig', data)
+}
+
 const createConnection = async data => {
   return post('/connection', data)
 }
@@ -31,6 +35,7 @@ const removeConnection = async id => {
 module.exports = {
   listConnections,
   setConnectionFB,
+  setConnectionIG,
   createConnection,
   updateConnection,
   detailConnection,
