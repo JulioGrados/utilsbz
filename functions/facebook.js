@@ -136,8 +136,8 @@ const subscribeApp = async (id, token) => {
       return data;
   }
   catch (error) {
-      throw error;
-  }
+      throw error;
+  }
 }
 
 //eventos de facebook cuando se envie un mensaje 
