@@ -88,14 +88,14 @@ const getPageProfile = async (id, token) => {
   console.log('id', id)
   console.log('token', token)
   try {
-      const accountsResponse = await axios.get(`https://graph.facebook.com/v16.0/${id}/accounts`, {
+      const accountsResponse = await axios.get(`https://graph.facebook.com/v16.0/me/accounts`, {
         params: {
           access_token: token,
           fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
         }
       })
       console.log('accountsResponse.data.data', accountsResponse)
-      return response.data;
+      return response.data.data;
   }
   catch (error) {
       console.log(error.response.data.error);
