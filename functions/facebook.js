@@ -84,9 +84,23 @@ const sendMessageMediaFacebook = async (pageAccessToken, recipientId, url, messa
 }
 
 // Funciones Facebook, proyecto brasil
-const getPageProfile = async (id, token) => {
-  console.log('id', id)
-  console.log('token', token)
+const getPageProfileFB = async (id, token) => {
+  try {
+      const accountsResponse = await axios.get(`https://graph.facebook.com/v16.0/${id}/accounts`, {
+        params: {
+          access_token: token,
+        }
+      })
+      console.log('accountsResponse.data.data', accountsResponse)
+      return accountsResponse.data.data
+  }
+  catch (error) {
+      console.log(error.response.data.error);
+      throw error
+  }
+};
+
+const getPageProfileIG = async (id, token) => {
   try {
       const accountsResponse = await axios.get(`https://graph.facebook.com/v13.0/${id}/accounts?access_token=${token}`, {
         params: {
@@ -95,31 +109,6 @@ const getPageProfile = async (id, token) => {
         }
       })
       console.log('accountsResponse.data.data', accountsResponse.data)
-      // const pagesRes = await axios.get('https://graph.facebook.com/v16.0/me/accounts', {
-      //   params: {
-      //     access_token: token
-      //   }
-      // });
-  
-      // const pages = pagesRes.data.data;
-
-      // const detailedPages = await Promise.all(
-      //   pages.map(async (page) => {
-      //     const pageId = page.id;
-      //     const pageToken = page.access_token;
-  
-      //     const pageDetailsRes = await axios.get(`https://graph.facebook.com/v16.0/${pageId}`, {
-      //       params: {
-      //         access_token: pageToken,
-      //         fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
-      //       }
-      //     });
-      //     console.log('pageDetailsRes', pageDetailsRes)
-      //     return pageDetailsRes.data;
-      //   })
-      // );
-  
-      // return detailedPages;
 
       return accountsResponse.data.data;
   }
@@ -368,7 +357,8 @@ const sendImageById = async (attachmentId, token, id, type) => {
 module.exports = {
   sendMessageTextFacebook,
   sendMessageMediaFacebook,
-  getPageProfile,
+  getPageProfileFB,
+  getPageProfileIG,
   getAccessTokenFromPage,
   subscribeApp,
   profilePsid,
