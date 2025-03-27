@@ -156,6 +156,32 @@ const subscribeApp = async (id, token) => {
   }
 }
 
+const subscribeAppIG = async (id, token) => {
+  try {
+    const response = await axios.post(
+      `https://graph.facebook.com/v16.0/${id}/subscribed_apps`,
+      null, // el cuerpo es nulo
+      {
+        params: {
+          access_token: token,
+          subscribed_fields: [
+            "messages",
+            "messaging_postbacks",
+            "message_reactions",
+            "message_deliveries",
+            "message_reads",
+            "message_echoes"
+          ].join(",")
+        }
+      }
+    );
+
+    console.log("Suscripción exitosa:", response.data);
+  } catch (error) {
+    console.error("Error al suscribirse:", error.response?.data || error.message);
+  }
+}
+
 //eventos de facebook cuando se envie un mensaje 
 const apiBase = (token) => axios.create({
   baseURL: "https://graph.facebook.com/v13.0/",
@@ -361,6 +387,7 @@ module.exports = {
   getPageProfileIG,
   getAccessTokenFromPage,
   subscribeApp,
+  subscribeAppIG,
   profilePsid,
   markSeen,
   sendText,
