@@ -91,11 +91,11 @@ const getPageProfileFB = async (id, token) => {
           access_token: token,
         }
       })
-      console.log('accountsResponse.data.data', accountsResponse)
+      // console.log('accountsResponse.data.data', accountsResponse)
       return accountsResponse.data.data
   }
   catch (error) {
-      console.log(error.response.data.error);
+      console.log(error);
       throw error
   }
 };
@@ -108,12 +108,12 @@ const getPageProfileIG = async (id, token) => {
           fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
         }
       })
-      console.log('accountsResponse.data.data', accountsResponse.data)
+      // console.log('accountsResponse.data.data', accountsResponse.data)
 
       return accountsResponse.data.data;
   }
   catch (error) {
-      console.log(error.response.data.error);
+      console.log(error);
       throw error
   }
 };
@@ -128,7 +128,7 @@ const getAccessTokenFromPage = async (appId, appSecret, token) => {
             fb_exchange_token: token
         }
     });
-    console.log('data', data)
+    // console.log('data', data)
     return data.data.access_token;
   }
   catch (error) {
@@ -138,7 +138,7 @@ const getAccessTokenFromPage = async (appId, appSecret, token) => {
 
 const subscribeApp = async (id, token) => {
   try {
-      const { data } = await axios.post(`https://graph.facebook.com/v13.0/${id}/subscribed_apps?access_token=${token}`, {
+      const { data } = await axios.post(`https://graph.facebook.com/v22.0/${id}/subscribed_apps?access_token=${token}`, {
           subscribed_fields: [
               "messages",
               "messaging_postbacks",
