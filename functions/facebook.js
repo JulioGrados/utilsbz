@@ -121,7 +121,7 @@ const getPageProfile = async (id, token) => {
   
       // return detailedPages;
 
-      return response.data.data;
+      return accountsResponse.data.data;
   }
   catch (error) {
       console.log(error.response.data.error);
