@@ -94,7 +94,7 @@ const getPageProfile = async (id, token) => {
           fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
         }
       })
-      console.log('accountsResponse.data.data', accountsResponse)
+      console.log('accountsResponse.data.data', accountsResponse.data)
       // const pagesRes = await axios.get('https://graph.facebook.com/v16.0/me/accounts', {
       //   params: {
       //     access_token: token
