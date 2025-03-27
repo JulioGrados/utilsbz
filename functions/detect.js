@@ -14,25 +14,48 @@ const detectFileType = async (file) => {
     
     // 1. Intentar detectar con file-type
     const detected = await fileType.fromBuffer(file.data);
+    let ext = null;
+    let mime = null;
+
     if (detected && detected.ext !== 'xml') {
-        return detected;
-    }
+        ext = detected.ext;
+        mime = detected.mime;
+    } else {
+        const text = file.data.toString('utf8');
+        for (const type of knownTextTypes) {
+            if (type.test(text)) {
+            ext = type.ext;
+            mime = type.mime;
+            break;
+            }
+        }
 
-    // 2. Convertir a texto para detecciones manuales
-    const text = file.data.toString('utf8');
-
-    // 3. Verificar tipos conocidos de texto
-    for (const type of knownTextTypes) {
-        if (type.test(text)) {
-            return { ext: type.ext, mime: type.mime };
+        if (!ext) {
+            ext = file.name?.split('.').pop() || 'bin';
+            mime = file.mimetype || 'application/octet-stream';
         }
     }
+
+    const category = getCategory(mime, ext);
     
-      // 4. Fallback: usar nombre y mimetype si todo falla
-    return {
-        ext: file.name?.split('.').pop() || 'bin',
-        mime: file.mimetype || 'application/octet-stream'
-    };
+    // 4. Fallback: usar nombre y mimetype si todo falla
+    return { ext, mime, category };
+}
+
+// Clasificador de categorías
+const getCategory = (mime, ext) => {
+    if (mime.startsWith('image/')) return 'image';
+    if (mime.startsWith('video/')) return 'video';
+    if (mime.startsWith('audio/')) return 'audio';
+
+    if (['pdf', 'doc', 'docx', 'odt', 'txt', 'rtf'].includes(ext)) return 'document';
+    if (['csv', 'json', 'xml', 'xls', 'xlsx'].includes(ext)) return 'data';
+    if (['html', 'js', 'ts', 'css', 'scss'].includes(ext)) return 'code';
+
+    if (mime.startsWith('text/')) return 'document';
+    if (mime.startsWith('application/')) return 'data';
+
+    return 'binary';
 }
 
 module.exports = {
