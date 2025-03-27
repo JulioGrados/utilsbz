@@ -88,40 +88,40 @@ const getPageProfile = async (id, token) => {
   console.log('id', id)
   console.log('token', token)
   try {
-      // const accountsResponse = await axios.get(`https://graph.facebook.com/v13.0/${id}/accounts?access_token=${token}`, {
-      //   params: {
-      //     access_token: token,
-      //     fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
-      //   }
-      // })
-      // console.log('accountsResponse.data.data', accountsResponse)
-      const pagesRes = await axios.get('https://graph.facebook.com/v16.0/me/accounts', {
+      const accountsResponse = await axios.get(`https://graph.facebook.com/v13.0/${id}/accounts?access_token=${token}`, {
         params: {
-          access_token: token
+          access_token: token,
+          fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
         }
-      });
+      })
+      console.log('accountsResponse.data.data', accountsResponse)
+      // const pagesRes = await axios.get('https://graph.facebook.com/v16.0/me/accounts', {
+      //   params: {
+      //     access_token: token
+      //   }
+      // });
   
-      const pages = pagesRes.data.data;
+      // const pages = pagesRes.data.data;
 
-      const detailedPages = await Promise.all(
-        pages.map(async (page) => {
-          const pageId = page.id;
-          const pageToken = page.access_token;
+      // const detailedPages = await Promise.all(
+      //   pages.map(async (page) => {
+      //     const pageId = page.id;
+      //     const pageToken = page.access_token;
   
-          const pageDetailsRes = await axios.get(`https://graph.facebook.com/v16.0/${pageId}`, {
-            params: {
-              access_token: pageToken,
-              fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
-            }
-          });
-          console.log('pageDetailsRes', pageDetailsRes)
-          return pageDetailsRes.data;
-        })
-      );
+      //     const pageDetailsRes = await axios.get(`https://graph.facebook.com/v16.0/${pageId}`, {
+      //       params: {
+      //         access_token: pageToken,
+      //         fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
+      //       }
+      //     });
+      //     console.log('pageDetailsRes', pageDetailsRes)
+      //     return pageDetailsRes.data;
+      //   })
+      // );
   
-      return detailedPages;
+      // return detailedPages;
 
-      // return response.data.data;
+      return response.data.data;
   }
   catch (error) {
       console.log(error.response.data.error);
