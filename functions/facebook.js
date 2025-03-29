@@ -86,7 +86,7 @@ const sendMessageMediaFacebook = async (pageAccessToken, recipientId, url, messa
 // Funciones Facebook, proyecto brasil
 const getPageProfileFB = async (id, token) => {
   try {
-      const accountsResponse = await axios.get(`https://graph.facebook.com/v16.0/${id}/accounts`, {
+      const accountsResponse = await axios.get(`https://graph.facebook.com/v22.0/${id}/accounts`, {
         params: {
           access_token: token,
         }
@@ -100,14 +100,9 @@ const getPageProfileFB = async (id, token) => {
   }
 };
 
-const getPageProfileIG = async (id, token) => {
+const getPageProfile = async (id, token) => {
   try {
-      const accountsResponse = await axios.get(`https://graph.facebook.com/v13.0/${id}/accounts?access_token=${token}`, {
-        params: {
-          access_token: token,
-          fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
-        }
-      })
+      const accountsResponse = await axios.get(`https://graph.facebook.com/v22.0/${id}/accounts?fields=name,access_token,instagram_business_account{id,username,profile_picture_url,name}`)
       // console.log('accountsResponse.data.data', accountsResponse.data)
 
       return accountsResponse.data.data;
@@ -120,7 +115,7 @@ const getPageProfileIG = async (id, token) => {
 
 const getAccessTokenFromPage = async (appId, appSecret, token) => {
   try {
-    const data = await axios.get("https://graph.facebook.com/v13.0/oauth/access_token", {
+    const data = await axios.get("https://graph.facebook.com/v22.0/oauth/access_token", {
         params: {
             client_id: appId,
             client_secret: appSecret,
@@ -158,33 +153,24 @@ const subscribeApp = async (id, token) => {
 
 const subscribeAppIG = async (id, token) => {
   try {
-    const response = await axios.post(
-      `https://graph.facebook.com/v16.0/${id}/subscribed_apps`,
-      null, // el cuerpo es nulo
-      {
-        params: {
-          access_token: token,
-          subscribed_fields: [
-            "messages",
-            "messaging_postbacks",
-            "message_reactions",
-            "message_deliveries",
-            "message_reads",
-            "message_echoes"
-          ].join(",")
-        }
-      }
-    );
-
-    console.log("Suscripción exitosa:", response.data);
+    const { data } = await axios.post(`https://graph.facebook.com/v22.0/${id}/subscribed_apps?access_token=${token}`, {
+      subscribed_fields: [
+          "messages",
+          "messaging_postbacks",
+          "message_reactions",
+          "messaging_seen",
+      ]
+    });
+    console.log('sus data', data);
+    return data;
   } catch (error) {
-    console.error("Error al suscribirse:", error.response?.data || error.message);
+    throw error
   }
 }
 
 //eventos de facebook cuando se envie un mensaje 
 const apiBase = (token) => axios.create({
-  baseURL: "https://graph.facebook.com/v13.0/",
+  baseURL: "https://graph.facebook.com/v22.0/",
   params: {
       access_token: token
   }
@@ -204,7 +190,7 @@ const getProfile = async (id, token) => {
 
 const profilePsid = async (id, token) => {
   try {
-      const { data } = await axios.get(`https://graph.facebook.com/v13.0/${id}?access_token=${token}`);
+      const { data } = await axios.get(`https://graph.facebook.com/v22.0/${id}?access_token=${token}`);
       return data;
   }
   catch (error) {
@@ -220,7 +206,7 @@ const profilePsid = async (id, token) => {
 
 const markSeen = async (id, token) => {
   try {
-    const url = `https://graph.facebook.com/v13.0/me/messages?access_token=${token}`;
+    const url = `https://graph.facebook.com/v22.0/me/messages?access_token=${token}`;
 
     const payload = {
         recipient: { id: id },
@@ -253,7 +239,7 @@ const sendText = async (id, text, token) => {
   // catch (error) {
   //     console.log(error);
   // }
-  const url = `https://graph.facebook.com/v13.0/me/messages?access_token=${token}`;
+  const url = `https://graph.facebook.com/v22.0/me/messages?access_token=${token}`;
 
   const messageData = {
     recipient: { id: id },
@@ -292,7 +278,7 @@ const sendAttachmentFromUrl = async (id, file, type, token) => {
   // catch (error) {
   //     console.log(error);
   // }
-  const url = `https://graph.facebook.com/v13.0/me/messages?access_token=${token}`;
+  const url = `https://graph.facebook.com/v22.0/me/messages?access_token=${token}`;
   
   const messageData = {
     recipient: { id: id },
@@ -321,7 +307,7 @@ const sendAttachmentFromUrl = async (id, file, type, token) => {
 
 const sendAttachment = async (id, file, type, token) => {
   console.log('file', file)
-  const url = `https://graph.facebook.com/v18.0/me/message_attachments?access_token=${token}`;
+  const url = `https://graph.facebook.com/v22.0/me/message_attachments?access_token=${token}`;
 
   const form = new FormData();
   form.append('message', JSON.stringify({
@@ -354,7 +340,7 @@ const sendAttachment = async (id, file, type, token) => {
 };
 
 const sendImageById = async (attachmentId, token, id, type) => {
-  const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${token}`;
+  const url = `https://graph.facebook.com/v22.0/me/messages?access_token=${token}`;
 
   const messageData = {
     recipient: { id: id },
@@ -384,7 +370,7 @@ module.exports = {
   sendMessageTextFacebook,
   sendMessageMediaFacebook,
   getPageProfileFB,
-  getPageProfileIG,
+  getPageProfile,
   getAccessTokenFromPage,
   subscribeApp,
   subscribeAppIG,
