@@ -11,7 +11,7 @@ const principalBody = (body) => {
 }
   
 const messageBody = (body, typeMsg) => {
-  let msgBody = '', fileName = '', contacts = [], quoted = ''
+  let msgBody = '', fileName = '', contacts = [], quoted = '', latitude = '', longitude = ''
 
   if (typeMsg === 'text') {
     msgBody = body && body.senderData && body.messageData.textMessageData && body.messageData.textMessageData.textMessage ? body.messageData.textMessageData.textMessage : ''
@@ -27,6 +27,12 @@ const messageBody = (body, typeMsg) => {
   } else if (typeMsg === 'reaction') {
     msgBody = body && body.messageData && body.messageData.extendedTextMessageData && body.messageData.extendedTextMessageData.text ? body.messageData.extendedTextMessageData.text : ''
     fileName = body && body.messageData && body.messageData.quotedMessage && body.messageData.quotedMessage.stanzaId ? body.messageData.quotedMessage.stanzaId : ''
+  } else if (typeMsg === 'location') {
+    msgBody = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.caption ? body.messageData.fileMessageData.caption : ''
+    fileName = body && body.senderData && body.messageData.locationMessageData && body.messageData.locationMessageData.jpegThumbnail ? body.messageData.locationMessageData.jpegThumbnail : ''
+    latitude = body && body.senderData && body.messageData.locationMessageData && body.messageData.locationMessageData.latitude ? body.messageData.locationMessageData.latitude : ''
+    longitude = body && body.senderData && body.messageData.locationMessageData && body.messageData.locationMessageData.longitude ? body.messageData.locationMessageData.longitude : ''
+    quoted = body && body.messageData && body.messageData.fileMessageData && body.messageData.fileMessageData.stanzaId ? body.messageData.fileMessageData.stanzaId : ''
   } else if (typeMsg === 'image') {
     msgBody = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.caption ? body.messageData.fileMessageData.caption : ''
     fileName = body && body.senderData && body.messageData.fileMessageData && body.messageData.fileMessageData.fileName ? body.messageData.fileMessageData.fileName : ''
@@ -71,7 +77,7 @@ const messageBody = (body, typeMsg) => {
       }
     }
   }
-  return {msgBody, fileName, contacts, quoted}
+  return {msgBody, fileName, contacts, quoted, latitude, longitude}
 }
   
 const fileBody = async (body, typeMsg) => {
