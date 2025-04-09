@@ -348,7 +348,7 @@ const sendUploadMedia = async (id, mediaUrl, mediaType, pageId, pageAccessToken)
         type: mediaType, // ej. "image", "video"
         payload: {
           url: mediaUrl,
-          is_reusable: "true"
+          is_reusable: true
         }
       }
     }
