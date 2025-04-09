@@ -364,14 +364,14 @@ const sendUploadMedia = async (id, mediaUrl, mediaType, pageId, pageAccessToken)
 
     console.log('Media uploaded successfully:', response.data);
     const attachmentId = response.data.attachment_id;
-    return  await sendTheMedia(attachmentId, pageAccessToken, id, mediaType);
+    return  await sendTheMedia(attachmentId, pageId, pageAccessToken, id, mediaType);
   } catch (error) {
     console.error('Error uploading media:', error.response?.data || error.message);
     throw error;
   }
 }
 
-const sendTheMedia = async (attachmentId, token, id, type) => {
+const sendTheMedia = async (attachmentId, pageId, token, id, type) => {
   const url = `https://graph.facebook.com/v22.0/${pageId}/messages`;
 
   const messageData = {
