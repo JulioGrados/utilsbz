@@ -230,20 +230,6 @@ const markSeen = async (id, token) => {
 };
 
 const sendText = async (id, text, token) => {
-  // try {
-  //     const { data } = await apiBase(token).post("me/messages", {
-  //         recipient: {
-  //             id
-  //         },
-  //         message: {
-  //             text: `${text}`
-  //         }
-  //     });
-  //     return data;
-  // }
-  // catch (error) {
-  //     console.log(error);
-  // }
   const url = `https://graph.facebook.com/v22.0/me/messages?access_token=${token}`;
 
   const messageData = {
@@ -264,25 +250,6 @@ const sendText = async (id, text, token) => {
 };
 
 const sendAttachmentFromUrl = async (id, file, type, token) => {
-  // try {
-  //     const { data } = await apiBase(token).post("me/messages", {
-  //         recipient: {
-  //             id
-  //         },
-  //         message: {
-  //             attachment: {
-  //                 type: type,
-  //                 payload: {
-  //                     url
-  //                 }
-  //             }
-  //         }
-  //     });
-  //     return data;
-  // }
-  // catch (error) {
-  //     console.log(error);
-  // }
   const url = `https://graph.facebook.com/v22.0/me/messages?access_token=${token}`;
   
   const messageData = {
@@ -371,6 +338,69 @@ const sendImageById = async (attachmentId, token, id, type) => {
   }
 };
 
+const sendUploadMedia = async (pageId, pageAccessToken, mediaType, mediaUrl) => {
+  const url = `https://graph.facebook.com/v22.0/${pageId}/message_attachments`;
+
+  const payload = {
+    platform: "instagram",
+    message: {
+      attachment: {
+        type: mediaType, // ej. "image", "video"
+        payload: {
+          url: mediaUrl,
+          is_reusable: "true"
+        }
+      }
+    }
+  };
+
+  try {
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${pageAccessToken}`
+      }
+    });
+
+    console.log('Media uploaded successfully:', response.data);
+    const attachmentId = response.data.attachment_id;
+    return  await sendTheMedia(attachmentId, pageAccessToken, pageId, mediaType);
+  } catch (error) {
+    console.error('Error uploading media:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+const sendTheMedia = async (attachmentId, token, id, type) => {
+  const url = `https://graph.facebook.com/v22.0/${pageId}/messages`;
+
+  const messageData = {
+    recipient: { id: id },
+    message: {
+      attachment: {
+        type: type,
+        payload: {
+          attachment_id: attachmentId
+        }
+      }
+    }
+  };
+
+  try {
+    const response = await axios.post(url, messageData, {
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    console.log("Imagen enviada con attachment_id:", response.data);
+    return response.data
+  } catch (error) {
+    console.error("Error enviando imagen:", error.response ? error.response.data : error);
+    throw error.response ? error.response.data : error
+  }
+};
+
 module.exports = {
   sendMessageTextFacebook,
   sendMessageMediaFacebook,
@@ -383,5 +413,6 @@ module.exports = {
   markSeen,
   sendText,
   sendAttachmentFromUrl,
-  sendAttachment
+  sendAttachment,
+  sendUploadMedia
 }
