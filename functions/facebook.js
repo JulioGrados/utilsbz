@@ -338,7 +338,7 @@ const sendImageById = async (attachmentId, token, id, type) => {
   }
 };
 
-const sendUploadMedia = async (pageId, pageAccessToken, mediaType, mediaUrl) => {
+const sendUploadMedia = async (id, mediaUrl, mediaType, pageId, pageAccessToken, pageId) => {
   const url = `https://graph.facebook.com/v22.0/${pageId}/message_attachments`;
 
   const payload = {
@@ -364,7 +364,7 @@ const sendUploadMedia = async (pageId, pageAccessToken, mediaType, mediaUrl) => 
 
     console.log('Media uploaded successfully:', response.data);
     const attachmentId = response.data.attachment_id;
-    return  await sendTheMedia(attachmentId, pageAccessToken, pageId, mediaType);
+    return  await sendTheMedia(attachmentId, pageAccessToken, id, mediaType);
   } catch (error) {
     console.error('Error uploading media:', error.response?.data || error.message);
     throw error;
