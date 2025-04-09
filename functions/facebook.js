@@ -338,7 +338,7 @@ const sendImageById = async (attachmentId, token, id, type) => {
   }
 };
 
-const sendUploadMedia = async (id, mediaUrl, mediaType, pageId, pageAccessToken, pageId) => {
+const sendUploadMedia = async (id, mediaUrl, mediaType, pageId, pageAccessToken) => {
   const url = `https://graph.facebook.com/v22.0/${pageId}/message_attachments`;
 
   const payload = {
