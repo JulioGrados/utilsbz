@@ -347,8 +347,7 @@ const sendUploadServer = async (id, file, mediaType, pageId, pageAccessToken) =>
   form.append('filedata', file.data, { filename: file.name, contentType: file.mimetype });
   form.append('message', JSON.stringify({
     attachment: {
-      type: mediaType,
-      is_reusable: true
+      type: mediaType
     }
   }));
 
