@@ -338,6 +338,38 @@ const sendImageById = async (attachmentId, token, id, type) => {
   }
 };
 
+const sendUploadServer = async (id, file, mediaType, pageId, pageAccessToken) => {
+  const url = `https://graph.facebook.com/v22.0/${pageId}/message_attachments`;
+
+  const form = new FormData();
+
+  form.append('platform', 'instagram');
+  form.append('filedata', file.data, { filename: file.name, contentType: file.mimetype });
+  form.append('message', JSON.stringify({
+    attachment: {
+      type: mediaType,
+      is_reusable: true
+    }
+  }));
+
+  try {
+    const response = await axios.post(url, form, {
+      headers: {
+        ...form.getHeaders(),
+        Authorization: `Bearer ${pageAccessToken}`
+      }
+    });
+
+    console.log("Imagen subida con éxito:", response.data);
+    const attachmentId = response.data.attachment_id;
+
+    return  await sendTheMedia(attachmentId, pageId, pageAccessToken, id, mediaType);
+  } catch (error) {
+    console.error('Error al subir el archivo:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
 const sendUploadMedia = async (id, mediaUrl, mediaType, pageId, pageAccessToken) => {
   const url = `https://graph.facebook.com/v22.0/${pageId}/message_attachments`;
 
@@ -414,5 +446,6 @@ module.exports = {
   sendText,
   sendAttachmentFromUrl,
   sendAttachment,
-  sendUploadMedia
+  sendUploadMedia,
+  sendUploadServer
 }
