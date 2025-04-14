@@ -52,7 +52,7 @@ const setMessage = async (id, token, chat, message) => {
       }
     })
 
-    return response
+    return response.data
   } catch (error) {
     console.log('error', error)
   }
