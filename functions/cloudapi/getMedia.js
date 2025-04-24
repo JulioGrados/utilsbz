@@ -166,6 +166,74 @@ const setAudio = async (id, token, chat, message, file) => {
   }
 }
 
+const sendMedia = async (id, token, chat, message, file) => {
+  try {
+    const form = new FormData();
+    form.append('file', file.data, {
+      filename: file.name,
+      contentType: file.mimetype
+    });
+    form.append('messaging_product', 'whatsapp');
+
+    const uploadResp = await axios.post(
+      `https://graph.facebook.com/v18.0/${id}/media`,
+      form,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...form.getHeaders()
+        }
+      }
+    );
+
+    const mediaId = uploadResp.data.id;
+    console.log('Media ID:', mediaId);
+
+    // Paso 2: Enviar el archivo
+    const tipo = obtenerTipoMensajeDesdeMime(file.mimetype); // 'document', 'image', etc.
+
+    const body = {
+      messaging_product: 'whatsapp',
+      to: chat.mobile,
+      type: tipo,
+      [tipo]: {
+        id: mediaId
+      }
+    };
+
+    if (tipo === 'document') {
+      body.document.filename = file.name;
+      body.document.caption = message;
+    } else if (tipo === 'image' || tipo === 'video') {
+      body[tipo].caption = 'Aquí está tu contenido';
+    }
+
+    const messageResp = await axios.post(
+      `https://graph.facebook.com/v18.0/${id}/messages`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log('Mensaje enviado:', messageResp.data);
+    return  messageResp.data
+  } catch (error) {
+    throw error
+  }
+}
+
+// Helper para decidir el tipo de mensaje desde mimetype
+function obtenerTipoMensajeDesdeMime(mimetype) {
+  if (mimetype.startsWith('image/')) return 'image';
+  if (mimetype.startsWith('video/')) return 'video';
+  if (mimetype.startsWith('audio/')) return 'audio';
+  return 'document'; // fallback por defecto
+}
+
 
 module.exports = {
   getMedia,
@@ -173,5 +241,6 @@ module.exports = {
   setImage,
   setVideo,
   setDocument,
-  setAudio
+  setAudio,
+  sendMedia
 }
