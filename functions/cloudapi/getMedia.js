@@ -7,7 +7,7 @@ const getMedia = async (id, token) => {
   try {
     const response = await axios({
       method: 'GET',
-      url: `https://graph.facebook.com/v17.0/${id}`,
+      url: `https://graph.facebook.com/v21.0/${id}`,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -36,7 +36,7 @@ const setMessage = async (id, token, chat, message) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v17.0/${id}/messages`,
+      url: `https://graph.facebook.com/v21.0/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
@@ -62,11 +62,11 @@ const setImage = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v17.0/${id}/messages`,
+      url: `https://graph.facebook.com/v21.0/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
-        to: chat.mobileCode + chat.mobile,
+        to: chat.mobile,
         type: 'image',
         image: {
           link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
@@ -89,11 +89,11 @@ const setVideo = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v17.0/${id}/messages`,
+      url: `https://graph.facebook.com/v21.0/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
-        to: chat.mobileCode + chat.mobile,
+        to: chat.mobile,
         type: 'video',
         video: {
           link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
@@ -116,11 +116,11 @@ const setDocument = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v17.0/${id}/messages`,
+      url: `https://graph.facebook.com/v21.0/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
-        to: chat.mobileCode + chat.mobile,
+        to: chat.mobile,
         type: 'document',
         document: {
           link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
@@ -143,11 +143,11 @@ const setAudio = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v17.0/${id}/messages`,
+      url: `https://graph.facebook.com/v21.0/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
-        to: chat.mobileCode + chat.mobile,
+        to: chat.mobile,
         type: 'audio',
         document: {
           link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
