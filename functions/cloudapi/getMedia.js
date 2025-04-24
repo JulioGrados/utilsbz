@@ -1,7 +1,7 @@
 'use strict'
 
 const axios = require('axios')
-const { saveImage } = require('../image')
+const FormData = require('form-data');
 
 const getMedia = async (id, token) => {
   try {
