@@ -205,7 +205,7 @@ const sendMedia = async (id, token, chat, message, file) => {
       body.document.filename = file.name;
       body.document.caption = message;
     } else if (tipo === 'image' || tipo === 'video') {
-      body[tipo].caption = 'Aquí está tu contenido';
+      body[tipo].caption = message;
     }
 
     const messageResp = await axios.post(
