@@ -2,6 +2,18 @@ const Papa = require("papaparse");
 const XLSX = require("xlsx");
 const { saveAs } = require("file-saver");
 
+const prepareDataForExport = (data) => {
+    return data.map(item => {
+        const newItem = { ...item };
+        for (const key in newItem) {
+            if (Array.isArray(newItem[key])) {
+                newItem[key] = newItem[key].join(", ");
+            }
+        }
+        return newItem;
+    });
+};
+
 const exportToCSV = (data, filename = "data.csv") => {
     const csv = Papa.unparse(data);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -9,7 +21,9 @@ const exportToCSV = (data, filename = "data.csv") => {
 };
 
 const exportToXLSX = (data, filename = "data.xlsx") => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    const preparedData = prepareDataForExport(data);
+
+    const worksheet = XLSX.utils.json_to_sheet(preparedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
 
