@@ -84,6 +84,40 @@ const sendMessageMediaFacebook = async (pageAccessToken, recipientId, url, messa
 }
 
 // Funciones Facebook, proyecto brasil
+// const getPageProfileFB = async (id, token) => {
+//   try {
+//       const accountsResponse = await axios.get(`https://graph.facebook.com/v22.0/${id}/accounts`, {
+//         params: {
+//           access_token: token,
+//         }
+//       })
+//       // console.log('accountsResponse.data.data', accountsResponse)
+//       return accountsResponse.data.data
+//   }
+//   catch (error) {
+//       console.log(error);
+//       throw error
+//   }
+// };
+
+// const getPageProfile = async (id, token) => {
+//   try {
+//       const accountsResponse = await axios.get(`https://graph.facebook.com/v22.0/${id}/accounts?access_token=${token}`, {
+//         params: {
+//           access_token: token,
+//           fields: 'name,access_token,instagram_business_account{id,username,profile_picture_url,name}'
+//         }
+//       })
+//       // console.log('accountsResponse.data.data', accountsResponse.data)
+
+//       return accountsResponse.data.data;
+//   }
+//   catch (error) {
+//       console.log(error);
+//       throw error
+//   }
+// };
+
 const getPageProfileFB = async (id, token) => {
   try {
       const accountsResponse = await axios.get(`https://graph.facebook.com/v22.0/${id}/accounts`, {
@@ -100,7 +134,7 @@ const getPageProfileFB = async (id, token) => {
   }
 };
 
-const getPageProfile = async (id, token) => {
+const getPageProfileIG = async (id, token) => {
   try {
       const accountsResponse = await axios.get(`https://graph.facebook.com/v22.0/${id}/accounts?access_token=${token}`, {
         params: {
@@ -158,21 +192,29 @@ const subscribeApp = async (id, token) => {
 
 const subscribeAppIG = async (id, token) => {
   try {
-    const { data } = await axios.post(`https://graph.facebook.com/v22.0/${id}/subscribed_apps?access_token=${token}`, {
-      subscribed_fields: [
-          "messages",
-          "messaging_postbacks",
-          "message_reactions",
-          "messaging_seen",
-      ]
-    });
-    console.log('sus data', data);
-    return data;
+    const response = await axios.post(
+      `https://graph.facebook.com/v22.0/${id}/subscribed_apps`,
+      null, // el cuerpo es nulo
+      {
+        params: {
+          access_token: token,
+          subscribed_fields: [
+            "messages",
+            "messaging_postbacks",
+            "message_reactions",
+            "message_deliveries",
+            "message_reads",
+            "message_echoes"
+          ].join(",")
+        }
+      }
+    );
+
+    console.log("Suscripción exitosa:", response.data);
   } catch (error) {
-    throw error
+    console.error("Error al suscribirse:", error.response?.data || error.message);
   }
 }
-
 //eventos de facebook cuando se envie un mensaje 
 const apiBase = (token) => axios.create({
   baseURL: "https://graph.facebook.com/v22.0/",
@@ -436,7 +478,7 @@ module.exports = {
   sendMessageTextFacebook,
   sendMessageMediaFacebook,
   getPageProfileFB,
-  getPageProfile,
+  getPageProfileIG,
   getAccessTokenFromPage,
   subscribeApp,
   subscribeAppIG,
