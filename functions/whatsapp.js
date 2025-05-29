@@ -16,7 +16,7 @@ const messageBody = (body, typeMsg) => {
   if (typeMsg === 'text') {
     msgBody = body && body.senderData && body.messageData.textMessageData && body.messageData.textMessageData.textMessage ? body.messageData.textMessageData.textMessage : ''
     quoted = body && body.messageData && body.messageData.extendedTextMessageData && body.messageData.extendedTextMessageData.stanzaId ? body.messageData.extendedTextMessageData.stanzaId : ''
-  } else if (typeMsg === 'edit') {
+  } else if (typeMsg === 'edited') {
     msgBody = body && body.senderData && body.messageData.textMessageData && body.messageData.textMessageData.textMessage ? body.messageData.textMessageData.textMessage : ''
     fileName = body && body.messageData && body.messageData.extendedTextMessageData && body.messageData.extendedTextMessageData.stanzaId ? body.messageData.extendedTextMessageData.stanzaId : ''
   } else if (typeMsg === 'extendedText') {
