@@ -14,8 +14,8 @@ const messageBody = (body, typeMsg) => {
   let msgBody = '', fileName = '', contacts = [], quoted = '', latitude = '', longitude = ''
 
   if (typeMsg === 'text') {
-    msgBody = body && body.senderData && body.messageData.editedMessageData && body.messageData.editedMessageData.textMessage ? body.messageData.editedMessageData.textMessage : ''
-    msgBody = body && body.senderData && body.messageData.editedMessageData && body.messageData.editedMessageData.textMessage ? body.messageData.editedMessageData.textMessage : ''
+    msgBody = body && body.senderData && body.messageData.textMessageData && body.messageData.textMessageData.textMessage ? body.messageData.textMessageData.textMessage : ''
+    quoted = body && body.messageData && body.messageData.extendedTextMessageData && body.messageData.extendedTextMessageData.stanzaId ? body.messageData.extendedTextMessageData.stanzaId : ''
   } else if (typeMsg === 'edit') {
     msgBody = body && body.senderData && body.messageData.textMessageData && body.messageData.textMessageData.textMessage ? body.messageData.textMessageData.textMessage : ''
     fileName = body && body.messageData && body.messageData.extendedTextMessageData && body.messageData.extendedTextMessageData.stanzaId ? body.messageData.extendedTextMessageData.stanzaId : ''
