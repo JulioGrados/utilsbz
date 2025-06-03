@@ -20,6 +20,27 @@ const existWspGreen = async (idInstance, token, mobile) => {
   }
 }
 
+const editMessageGreen = async (idInstance, token, chatId, idMessage, text) => {
+  try {
+    const resp = await axios({
+      method: 'POST',
+      url: `https://api.greenapi.com/waInstance${idInstance}/editMessage/${token}`,
+      data: {
+        chatId: `${chatId}@c.us`,
+        idMessage: idMessage,
+        message: text
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    // console.log('resp', resp)
+    return resp
+  } catch (error) {
+    throw error
+  }
+}
+
 const deleteMessageGreen = async (idInstance, token, chatId, idMessage) => {
   try {
     const resp = await axios({
@@ -203,6 +224,7 @@ const sendGreenClient = async (idInstance, token, mobile, caption, route, fileNa
 module.exports = {
   existWspGreen,
   deleteMessageGreen,
+  editMessageGreen,
   sendMessageTextGreen,
   sendMessageTextQuotedGreen,
   sendMessageMediaGreen,
