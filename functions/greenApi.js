@@ -22,14 +22,16 @@ const existWspGreen = async (idInstance, token, mobile) => {
 
 const editMessageGreen = async (idInstance, token, chatId, idMessage, text) => {
   try {
+    const data = {
+      chatId: `${chatId}@c.us`,
+      idMessage: idMessage,
+      message: text
+    }
+    console.log('data', data)
     const resp = await axios({
       method: 'POST',
       url: `https://api.greenapi.com/waInstance${idInstance}/editMessage/${token}`,
-      data: {
-        chatId: `${chatId}@c.us`,
-        idMessage: idMessage,
-        message: text
-      },
+      data: data,
       headers: {
         'Content-Type': 'application/json'
       }
