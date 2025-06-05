@@ -34,9 +34,11 @@ const editMessageGreen = async (idInstance, token, chatId, idMessage, text) => {
         'Content-Type': 'application/json'
       }
     })
+    console.log('Response:', resp.data);
     // console.log('resp', resp)
     return resp
   } catch (error) {
+    console.error('Error:', error.response?.data || error.message);
     throw error
   }
 }
