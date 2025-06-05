@@ -30,7 +30,7 @@ const editMessageGreen = async (idInstance, token, chatId, idMessage, text) => {
     console.log('data', data)
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/editMessage/${token}`,
+      url: `https://7103.api.greenapi.com/waInstance${idInstance}/editMessage/${token}`,
       data: data,
       headers: {
         'Content-Type': 'application/json'
