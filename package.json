@@ -22,7 +22,7 @@
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "chalk": "^3.0.0",
-    "config": "git+https://AbelBizeus:ATBB65zG5Yxc5tPLarZ72VSf6TgL6A27B87A@bitbucket.org/devcodela/configbz.git",
+    "config": "https://JulioGrados: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@github.com/JulioGrados/configbz.git",
     "crypto-js": "^4.2.0",
     "csv-parser": "^3.2.0",
     "download": "^7.1.0",
