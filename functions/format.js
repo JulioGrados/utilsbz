@@ -1,37 +1,39 @@
-const FormatText = (text = "") => {
-  const boldRegex = /(?<=\s|^)\*(.*?)\*(?=\s|$)/g;
-  const italicRegex = /(?<=\s|^)_(.*?)_(?=\s|$)/g;
-  const striketroughRegex = /(?<=\s|^)~(.*?)~(?=\s|$)/g;
-  
-  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
-  const urlRegex = /\b((https?:\/\/|www\.)\S+)\b/gi;
+const boundaryAfter  = '(?=\\s|$|[.,;:!?])';
+const boundaryBefore = '(?<=\\s|^|[.,;:!?])';
 
-  // Reemplazo de URLs primero
+const boldRegex   = new RegExp(`${boundaryBefore}\\*(.*?)\\*${boundaryAfter}`, 'g');
+const italicRegex = new RegExp(`${boundaryBefore}_(.*?)_${boundaryAfter}`, 'g');
+const strikeRegex = new RegExp(`${boundaryBefore}~(.*?)~${boundaryAfter}`, 'g');
+
+const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+const urlRegex   = /\b((https?:\/\/|www\.)\S+)\b/gi;
+
+function FormatText(text = '') {
   let formattedText = text;
-  const urlMatches = formattedText.match(urlRegex);
-  if (urlMatches && urlMatches.length) {
-    urlMatches.forEach((item) => {
-      const hrefValue = item.startsWith('www.') ? `http://${item}` : item;
-      formattedText = formattedText.replace(item, `<a href="${hrefValue}" target="_blank">${item}</a>`);
-    });
-  }
 
-  // Reemplazo de correos electrónicos
-  const emailMatches = formattedText.match(emailRegex);
-  if (emailMatches && emailMatches.length) {
-    emailMatches.forEach((item) => {
-      formattedText = formattedText.replace(item, `<a href="mailto:${item}">${item}</a>`);
-    });
-  }
+  formattedText = formattedText
+    .replace(boldRegex, '<b>$1</b>')
+    .replace(italicRegex, '<i>$1</i>')
+    .replace(strikeRegex, '<s>$1</s>');
 
-  // Formateo de negrita, cursiva y tachado
-  formattedText = formattedText.replace(boldRegex, "<b>$1</b>")
-                               .replace(italicRegex, "<i>$1</i>")
-                               .replace(striketroughRegex, "<s>$1</s>");
+  // 1. URLs
+  formattedText = formattedText.replace(urlRegex, (m) => {
+    const href = m.startsWith('www.') ? `http://${m}` : m;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer">${m}</a>`;
+  });
+
+  // 2. Correos
+  formattedText = formattedText.replace(emailRegex, (m) => {
+    return `<a href="mailto:${m}">${m}</a>`;
+  });
+
+  // 3. Saltos de línea → <br>  (opcional)
+  formattedText = formattedText.replace(/\n/g, '<br>');
 
   return formattedText;
-};
+}
+
 
 module.exports = {
   FormatText
-}
+};
