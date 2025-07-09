@@ -9,6 +9,9 @@ const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
 const urlRegex   = /\b((https?:\/\/|www\.)\S+)\b/gi;
 
 function FormatText(text = '') {
+  if (typeof text !== 'string') {
+    return text;
+  }
   let formattedText = text;
 
   formattedText = formattedText
