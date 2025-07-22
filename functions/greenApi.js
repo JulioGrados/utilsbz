@@ -82,7 +82,7 @@ const sendMessageTextGreen = async (idInstance, token, chatId, text) => {
     return resp
   } catch (error) {
     console.log('error', error)
-    throw error
+    return null
   }
 }
 
