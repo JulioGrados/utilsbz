@@ -332,7 +332,10 @@ const sendAttachment = async (id, file, type, token) => {
   }));
 
   // Agregar la imagen como Buffer
-  form.append('filedata', file.data, { filename: file.name, contentType: file.mimetype });
+  form.append('filedata', Buffer.from(file.data.data), {
+    filename: file.name,
+    contentType: file.mimetype
+  });
 
   try {
       // Enviar la imagen a Facebook
