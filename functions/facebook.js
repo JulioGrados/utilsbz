@@ -389,7 +389,7 @@ const sendUploadServer = async (id, file, mediaType, pageId, pageAccessToken) =>
   const form = new FormData();
 
   form.append('platform', 'instagram');
-  form.append('filedata', file.data, { filename: file.name, contentType: file.mimetype });
+  form.append('filedata', file.data.data, { filename: file.name, contentType: file.mimetype });
   form.append('message', JSON.stringify({
     attachment: {
       type: mediaType
