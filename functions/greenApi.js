@@ -218,10 +218,23 @@ const sendGreenClient = async (idInstance, token, mobile, caption, route, fileNa
     apiTokenInstance: token
   }))
   if (typeMessage === 'image' || typeMessage === 'video' || typeMessage === 'document') { 
-    response = await restAPI.file.sendFileByUrl(`${mobile}@c.us`, null, route, fileName, caption)
+    response = await axios({
+      method: 'POST',
+      url: `https://api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${token}`,
+      data: {
+        chatId: `${mobile}@c.us`,
+        urlFile: route,
+        fileName: fileName,
+        caption: caption
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   } else {
     response = await restAPI.message.sendMessage(`${mobile}@c.us`, null, caption)
   }
+  console.log('response', response)
   return response
 }
 
