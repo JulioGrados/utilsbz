@@ -53,7 +53,7 @@ const saveFileHookAws = async (file, route) => {
     const params = {
         Bucket: bucketName,
         Key: formatFileName(route),
-        Body: file,
+        Body: file
     };
     try {
       const data = await client.send(new PutObjectCommand(params));

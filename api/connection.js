@@ -20,6 +20,10 @@ const getQRConnection = async data => {
   return get('/connection/qr', data)
 }
 
+const getStatusConnections = async data => {
+  return get('/connection/status', data)
+}
+
 const detailConnection = async (id, params, jwt) => {
   return getOne(`/connection/${id}`, params, jwt)
 }
@@ -40,5 +44,6 @@ module.exports = {
   updateConnection,
   detailConnection,
   getQRConnection,
+  getStatusConnections,
   removeConnection
 }
