@@ -25,12 +25,13 @@ const sendTextWebhook = async (connection, mobileCode, mobile, message, url, moo
     }
 }
 
-const sendMediaWebhook = async (connection, typeMsg, mobileCode, mobile, message, fileName, file, url, mood) => {
+const sendMediaWebhook = async (chatId, connection, typeMsg, mobileCode, mobile, message, fileName, file, url, mood) => {
     try {
         const resp = await axios({
             method: 'POST',
             url: url,
             data: {
+                chatId: chatId,
                 connection: connection,
                 typeMessage: typeMsg,
                 mobileCode: mobileCode,
