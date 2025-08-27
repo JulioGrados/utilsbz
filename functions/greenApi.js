@@ -5,7 +5,7 @@ const existWspGreen = async (idInstance, token, mobile) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/checkWhatsapp/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/checkWhatsapp/${token}`,
       data: {
         phoneNumber: parseInt(mobile)
       },
@@ -30,7 +30,7 @@ const editMessageGreen = async (idInstance, token, chatId, idMessage, text) => {
     console.log('data', data)
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/editMessage/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/editMessage/${token}`,
       data: data,
       headers: {
         'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ const deleteMessageGreen = async (idInstance, token, chatId, idMessage) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/deleteMessage/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/deleteMessage/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         idMessage: idMessage
@@ -69,7 +69,7 @@ const sendMessageTextGreen = async (idInstance, token, chatId, text) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/sendMessage/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/sendMessage/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         message: text
@@ -90,7 +90,7 @@ const sendMessageTextQuotedGreen = async (idInstance, token, chatId, text, quote
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/sendMessage/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/sendMessage/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         message: text,
@@ -112,7 +112,7 @@ const sendMessageMediaGreen = async (idInstance, token, chatId, url, filename = 
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/sendFileByUrl/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         urlFile: url,
@@ -134,7 +134,7 @@ const sendMessageMediaQuotedGreen = async (idInstance, token, chatId, url, filen
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/sendFileByUrl/${token}`,
       data: {
         chatId: `${chatId}@c.us`,
         urlFile: url,
@@ -157,7 +157,7 @@ const sendMarkReadGreen = async (idInstance, token, chatId) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/readChat/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/readChat/${token}`,
       data: {
         chatId: `${chatId}@c.us`
       },
@@ -195,7 +195,7 @@ const getAvatarGreen = async (idInstance, token, chatId) => {
   try {
     const resp = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/getAvatar/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/getAvatar/${token}`,
       data: {
         chatId: `${chatId}@c.us`
       },
@@ -220,7 +220,7 @@ const sendGreenClient = async (idInstance, token, mobile, caption, route, fileNa
   if (typeMessage === 'image' || typeMessage === 'video' || typeMessage === 'document') { 
     response = await axios({
       method: 'POST',
-      url: `https://api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${token}`,
+      url: `https://api.green-api.com/waInstance${idInstance}/sendFileByUrl/${token}`,
       data: {
         chatId: `${mobile}@c.us`,
         urlFile: route,
