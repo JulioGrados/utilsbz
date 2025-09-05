@@ -28,7 +28,11 @@ function formatFileName(fileName) {
 
 const saveFileAws = async (file, route) => {
     console.log("aws")
-    const cleanName = file.name.toLowerCase().replace(/\s/g, '');
+    const cleanName = file.name.toLowerCase()
+        .replace(/\s+/g, '_')           // Reemplaza espacios con guiones bajos
+        .replace(/[^a-z0-9._-]/g, '')   // Elimina caracteres especiales, mantiene solo alfanuméricos, puntos, guiones bajos y guiones
+        .replace(/_{2,}/g, '_')         // Reemplaza múltiples guiones bajos con uno solo
+        .replace(/^_+|_+$/g, '');       // Elimina guiones bajos al inicio y final
     const fileroot = route + '/' + file.md5 + '-' + cleanName;
     const params = {
         Bucket: bucketName,
