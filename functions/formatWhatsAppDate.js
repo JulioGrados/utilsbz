@@ -52,4 +52,6 @@ const formatWhatsAppDate = (isoDateString) => {
     return msgMoment.format('DD/MM/YYYY');
 }
 
-export default formatWhatsAppDate
+module.exports = {
+    formatWhatsAppDate
+}
