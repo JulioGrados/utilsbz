@@ -48,7 +48,7 @@ const isLoggedContact = async ctx => {
     return null
   }
   
-  if (!notSeeContact) {
+  if (notSeeContact) {
     redirect({ ctx, location: '/401' })
     return null
   } 
