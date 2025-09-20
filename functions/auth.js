@@ -56,7 +56,7 @@ const isLoggedContact = async ctx => {
   return { jwt: ctx.jwt }
 }
 
-module.exports = {
+export {
   comparePass,
   generateHash,
   isLoggedUser,
