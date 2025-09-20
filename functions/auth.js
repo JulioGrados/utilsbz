@@ -40,9 +40,26 @@ const isLoggedRole = async ctx => {
   return { jwt: ctx.jwt }
 }
 
+const isLoggedContact = async ctx => {
+  const notSeeContact = ctx && ctx.currentUser && ctx.currentUser.notSeeContact ? ctx.currentUser.notSeeContact : false
+
+  if (!ctx.jwt) {
+    redirect({ ctx, location: '/login' })
+    return null
+  }
+  
+  if (notSeeContact) {
+    redirect({ ctx, location: '/401' })
+    return null
+  } 
+
+  return { jwt: ctx.jwt }
+}
+
 module.exports = {
   comparePass,
   generateHash,
   isLoggedUser,
-  isLoggedRole
+  isLoggedRole,
+  isLoggedContact
 }
