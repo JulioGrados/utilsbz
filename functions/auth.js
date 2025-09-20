@@ -1,5 +1,7 @@
-import bcrypt from 'bcryptjs'
-import { redirect } from './redirect.js'
+'use strict'
+
+const bcrypt = require('bcryptjs')
+const { redirect } = require('./redirect')
 
 const comparePass = (password, passwordDB) => {
   const passCorrect = bcrypt.compareSync(password, passwordDB)
@@ -39,7 +41,7 @@ const isLoggedRole = async ctx => {
 }
 
 const isLoggedContact = async ctx => {
-  const notSeeContact = ctx && ctx.currentUser && ctx.currentUser.notSeeContact
+  const notSeeContact = ctx && ctx.currentUser && ctx.currentUser.notSeeContact ? ctx.currentUser.notSeeContact : false
 
   if (!ctx.jwt) {
     redirect({ ctx, location: '/login' })
@@ -54,7 +56,7 @@ const isLoggedContact = async ctx => {
   return { jwt: ctx.jwt }
 }
 
-export {
+module.exports = {
   comparePass,
   generateHash,
   isLoggedUser,

@@ -13,4 +13,6 @@ const redirect = ({ Router, ctx, location, status = 302 }) => {
   document.location.pathname = location
 }
 
-export { redirect }
+module.exports = {
+  redirect
+}
