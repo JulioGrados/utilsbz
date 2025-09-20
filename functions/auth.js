@@ -1,7 +1,5 @@
-'use strict'
-
-const bcrypt = require('bcryptjs')
-const { redirect } = require('./redirect')
+import bcrypt from 'bcryptjs'
+import { redirect } from './redirect.js'
 
 const comparePass = (password, passwordDB) => {
   const passCorrect = bcrypt.compareSync(password, passwordDB)
