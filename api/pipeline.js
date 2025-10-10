@@ -20,10 +20,15 @@ const removePipeline = async id => {
   return remove(`/pipeline/${id}`)
 }
 
+const reorderStages = (pipelineId, stages) => {
+  return put(`/pipelines/${pipelineId}/stages/reorder`, {stages})
+}
+
 module.exports = {
   listPipelines,
   createPipeline,
   updatePipeline,
   detailPipeline,
-  removePipeline
+  removePipeline,
+  reorderStages
 }
