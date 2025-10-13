@@ -21,7 +21,7 @@ const removePipeline = async id => {
 }
 
 const reorderPipeline = async data => {
-  return post(`/pipelines/stages/reorder`, data)
+  return post(`/pipeline/stages`, data)
 }
 
 module.exports = {
