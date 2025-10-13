@@ -21,7 +21,7 @@ const removePipeline = async id => {
 }
 
 const reorderStages = (pipelineId, stages) => {
-  return put(`/pipelines/${pipelineId}/stages/reorder`, {stages: stages})
+  return post(`/pipelines/stages/reorder`, {stages: stages, pipelineId: pipelineId})
 }
 
 module.exports = {
