@@ -32,6 +32,10 @@ const updateChat = async (id, data) => {
   return put(`/chats/${id}`, data)
 }
 
+const moveChat = async (id, data) => {
+  return put(`/chats/${id}/move`, data)
+}
+
 const removeChat = async id => {
   return remove(`/chats/${id}`)
 }
@@ -44,6 +48,7 @@ module.exports = {
   createChat,
   createoreditChat,
   updateChat,
+  moveChat,
   detailChat,
   removeChat
 }
