@@ -4,6 +4,10 @@ const listChats = async params => {
   return get('/chats', params)
 }
 
+const listChatsPipeline = async params => {
+  return get('/chats/pipeline', params)
+}
+
 const filterChats = async params => {
   return get('/chats/filter', params)
 }
@@ -42,6 +46,7 @@ const removeChat = async id => {
 
 module.exports = {
   listChats,
+  listChatsPipeline,
   filterChats,
   filterMessages,
   countChats,
