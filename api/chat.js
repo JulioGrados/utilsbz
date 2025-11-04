@@ -5,7 +5,7 @@ const listChats = async params => {
 }
 
 const listChatsPipeline = async params => {
-  return get('/chats/pipeline', params)
+  return getOne('/chats/pipeline', params)
 }
 
 const filterChats = async params => {
@@ -17,7 +17,7 @@ const filterMessages = async params => {
 }
 
 const countChats = async params => {
-  return getOne('/chats/count', params)
+  return get('/chats/count', params)
 }
 
 const createChat = async data => {
