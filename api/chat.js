@@ -17,7 +17,7 @@ const filterMessages = async params => {
 }
 
 const countChats = async params => {
-  return get('/chats/count', params)
+  return getOne('/chats/count', params)
 }
 
 const createChat = async data => {
