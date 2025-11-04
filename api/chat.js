@@ -4,10 +4,8 @@ const listChats = async params => {
   return get('/chats', params)
 }
 
-const chatStagePipeline = async (id, params) => {
-  console.log('id', id)
-  console.log('params', params)
-  return getOne('/chats/pipeline', params)
+const chatStagePipeline = async (params) => {
+  return get('/chats/pipeline', params)
 }
 
 const filterChats = async params => {
