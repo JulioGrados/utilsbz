@@ -12,6 +12,10 @@ const filterChats = async params => {
   return get('/chats/filter', params)
 }
 
+const updateManyTime = async data => {
+  return post('/chats/filter', data)
+}
+
 const filterMessages = async params => {
   return get('/chats/message', params)
 }
@@ -53,6 +57,7 @@ module.exports = {
   createChat,
   createoreditChat,
   updateChat,
+  updateManyTime,
   moveChat,
   detailChat,
   removeChat
