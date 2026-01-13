@@ -25,7 +25,7 @@ const sendTextWebhook = async (connection, mobileCode, mobile, message, url, moo
     }
 }
 
-const sendMediaWebhook = async (chatId, connection, typeMsg, mobileCode, mobile, message, fileName, file, url, mood) => {
+const sendMediaWebhook = async (chatId, connection, typeMsg, mobileCode, mobile, message, fileName, file, url, mood, contact) => {
     try {
         const resp = await axios({
             method: 'POST',
@@ -39,7 +39,8 @@ const sendMediaWebhook = async (chatId, connection, typeMsg, mobileCode, mobile,
                 caption: message,
                 fileName: fileName ? fileName : '',
                 file: file ? `https://bizeus-test.s3.us-east-2.amazonaws.com${file}` : '',
-                mood: mood
+                mood: mood, 
+                contact: contact
             },
             headers: {
                 'Content-Type': 'application/json'
