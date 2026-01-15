@@ -7,6 +7,7 @@ const session = require('./functions/session')
 const reducers = require('./functions/reducers')
 const transform = require('./functions/transform')
 const user = require('./functions/user')
+const wahaApi = require('./functions/wahaApi')
 
 module.exports = {
   log,
@@ -15,5 +16,7 @@ module.exports = {
   session,
   reducers,
   transform,
-  user
+  user,
+  // WAHA API
+  ...wahaApi
 }
