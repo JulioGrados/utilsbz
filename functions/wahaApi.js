@@ -39,7 +39,10 @@ const createSessionWaha = async (sessionName, webhookUrl) => {
           url: webhookUrl,
           events: ['message', 'message.ack', 'session.status'],
           hmac: null,
-          retries: 3
+          retries: {
+            attempts: 3,
+            delaySeconds: 2
+          }
         }]
       }
     })
