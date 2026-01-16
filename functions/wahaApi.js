@@ -54,18 +54,60 @@ const createSessionWaha = async (sessionName, webhookUrl) => {
 }
 
 /**
- * Obtener QR code para autenticación
+ * Reiniciar sesión para obtener nuevo QR
  * @param {string} sessionName
- * @returns {Promise<{value: string}>} QR en base64
  */
-const getQRCodeWaha = async (sessionName) => {
+const restartSessionWaha = async (sessionName) => {
   try {
-    const resp = await wahaClient.get(`/api/${sessionName}/auth/qr`, {
-      params: { format: 'raw' }
-    })
+    // Primero detener la sesión
+    await wahaClient.post(`/api/sessions/${sessionName}/stop`).catch(() => {})
+    // Esperar un momento
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Iniciar la sesión nuevamente
+    const resp = await wahaClient.post(`/api/sessions/${sessionName}/start`)
     return resp.data
   } catch (error) {
-    if (error.response?.status === 404) {
+    console.error('Error reiniciando sesión WAHA:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+/**
+ * Obtener QR code para autenticación
+ * @param {string} sessionName
+ * @param {boolean} forceRestart - Si es true, reinicia la sesión para obtener nuevo QR
+ * @returns {Promise<{value: string}>} QR en base64
+ */
+const getQRCodeWaha = async (sessionName, forceRestart = false) => {
+  try {
+    // Verificar estado de la sesión primero
+    let sessionStatus
+    try {
+      const statusResp = await wahaClient.get(`/api/sessions/${sessionName}`)
+      sessionStatus = statusResp.data?.status
+      console.log(`📊 [WAHA] Estado de sesión ${sessionName}: ${sessionStatus}`)
+    } catch (e) {
+      sessionStatus = 'UNKNOWN'
+    }
+
+    // Si la sesión no está en SCAN_QR_CODE, necesitamos reiniciarla
+    if (forceRestart || (sessionStatus !== 'SCAN_QR_CODE' && sessionStatus !== 'STARTING')) {
+      console.log(`🔄 [WAHA] Reiniciando sesión para obtener nuevo QR...`)
+      await restartSessionWaha(sessionName)
+      // Esperar a que la sesión esté lista para escanear
+      await new Promise(resolve => setTimeout(resolve, 2000))
+    }
+
+    // Obtener QR
+    const resp = await wahaClient.get(`/api/${sessionName}/auth/qr`, {
+      params: { format: 'image' },
+      responseType: 'arraybuffer'
+    })
+    // Convertir a base64
+    const base64 = Buffer.from(resp.data, 'binary').toString('base64')
+    return { value: `data:image/png;base64,${base64}` }
+  } catch (error) {
+    if (error.response?.status === 404 || error.response?.status === 422) {
       throw new Error('QR_NOT_AVAILABLE')
     }
     throw error
@@ -397,6 +439,7 @@ module.exports = {
   getQRCodeWaha,
   getSessionStatusWaha,
   stopSessionWaha,
+  restartSessionWaha,
   deleteSessionWaha,
   getMeWaha,
 
