@@ -303,11 +303,28 @@ const deleteSessionWaha = async (sessionName) => {
  * Actualizar configuración de webhook para una sesión existente
  * Necesario para agregar eventos como message.any a sesiones ya creadas
  * Usa la misma lista de eventos que createSessionWaha (WAHA_WEBHOOK_EVENTS)
+ * IMPORTANTE: Preserva la configuración de noweb.store para no perder el acceso a sendSeen
  */
 const updateSessionWebhookWaha = async (sessionName, webhookUrl) => {
   return withRetry(async () => {
+    // Primero obtener la configuración actual para preservar noweb.store
+    let currentConfig = {}
+    try {
+      const currentSession = await wahaClient.get(`/api/sessions/${sessionName}`, { timeout: TIMEOUTS.session })
+      currentConfig = currentSession.data?.config || {}
+    } catch (e) {
+      console.warn(`⚠️ [WAHA] No se pudo obtener config actual de ${sessionName}, usando defaults`)
+    }
+
     const resp = await wahaClient.put(`/api/sessions/${sessionName}`, {
       config: {
+        // Preservar configuración de noweb (incluyendo store)
+        noweb: currentConfig.noweb || {
+          store: {
+            enabled: true,
+            fullSync: false
+          }
+        },
         webhooks: [{
           url: webhookUrl,
           events: WAHA_WEBHOOK_EVENTS,
