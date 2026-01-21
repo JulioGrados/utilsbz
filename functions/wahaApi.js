@@ -2,13 +2,30 @@ const axios = require('axios')
 
 /**
  * Cliente base para WAHA API
- * Similar a las funciones de greenApi.js pero para WAHA
+ * Con retry automático, timeouts mejorados y manejo de sesiones
  */
 
 // ==================== CONFIGURACIÓN ====================
 
 const WAHA_BASE_URL = process.env.WAHA_BASE_URL || 'https://appbizeus-waha-prod.m1imp2.easypanel.host'
 const WAHA_API_KEY = process.env.WAHA_API_KEY || 'waha_sk_bizeus_8d1a6e35234fbcb82ddffc4a1eaad2c0'
+
+// Timeouts configurables
+const TIMEOUTS = {
+  default: 30000,      // 30s para operaciones generales
+  message: 60000,      // 60s para envío de mensajes
+  media: 120000,       // 120s para envío de media (archivos grandes)
+  download: 90000,     // 90s para descarga de archivos
+  session: 45000       // 45s para operaciones de sesión
+}
+
+// Configuración de retry
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 1000,   // 1 segundo inicial
+  maxDelayMs: 10000,   // máximo 10 segundos
+  retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'ENOTFOUND', 'ENETUNREACH']
+}
 
 /**
  * Cliente HTTP configurado para WAHA
@@ -19,25 +36,176 @@ const wahaClient = axios.create({
     'X-Api-Key': WAHA_API_KEY,
     'Content-Type': 'application/json'
   },
-  timeout: 30000
+  timeout: TIMEOUTS.default
 })
+
+// ==================== UTILIDADES ====================
+
+/**
+ * Delay con promesa
+ */
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+/**
+ * Calcular delay con backoff exponencial
+ */
+const calculateBackoff = (attempt, baseDelay = RETRY_CONFIG.baseDelayMs) => {
+  const exponentialDelay = baseDelay * Math.pow(2, attempt)
+  const jitter = Math.random() * 1000 // Añadir jitter para evitar thundering herd
+  return Math.min(exponentialDelay + jitter, RETRY_CONFIG.maxDelayMs)
+}
+
+/**
+ * Determinar si un error es retriable
+ */
+const isRetryableError = (error) => {
+  // Errores de red
+  if (RETRY_CONFIG.retryableErrors.includes(error.code)) {
+    return true
+  }
+
+  // Timeout
+  if (error.message?.includes('timeout') || error.code === 'ECONNABORTED') {
+    return true
+  }
+
+  // Errores de servidor (5xx)
+  if (error.response?.status >= 500) {
+    return true
+  }
+
+  // Error 429 (rate limit)
+  if (error.response?.status === 429) {
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Ejecutar función con retry y backoff exponencial
+ */
+const withRetry = async (fn, options = {}) => {
+  const {
+    maxRetries = RETRY_CONFIG.maxRetries,
+    context = 'WAHA API',
+    onRetry = null
+  } = options
+
+  let lastError
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error
+
+      // Si no es retriable, lanzar inmediatamente
+      if (!isRetryableError(error)) {
+        throw error
+      }
+
+      // Si ya agotamos los reintentos
+      if (attempt >= maxRetries) {
+        console.error(`❌ [${context}] Fallido después de ${maxRetries + 1} intentos:`, error.message)
+        throw error
+      }
+
+      const backoffMs = calculateBackoff(attempt)
+      console.warn(`⚠️ [${context}] Intento ${attempt + 1}/${maxRetries + 1} falló. Reintentando en ${Math.round(backoffMs)}ms...`, error.message)
+
+      if (onRetry) {
+        await onRetry(attempt, error)
+      }
+
+      await delay(backoffMs)
+    }
+  }
+
+  throw lastError
+}
+
+/**
+ * Verificar si la sesión está activa y saludable
+ */
+const checkSessionHealth = async (sessionName) => {
+  try {
+    const resp = await wahaClient.get(`/api/sessions/${sessionName}`, {
+      timeout: TIMEOUTS.session
+    })
+
+    const status = resp.data?.status
+    const isHealthy = status === 'WORKING'
+
+    return {
+      isHealthy,
+      status,
+      me: resp.data?.me,
+      error: isHealthy ? null : `Sesión no está activa (estado: ${status})`
+    }
+  } catch (error) {
+    return {
+      isHealthy: false,
+      status: 'UNKNOWN',
+      me: null,
+      error: error.message
+    }
+  }
+}
 
 // ==================== SESSION MANAGEMENT ====================
 
 /**
+ * Eventos de WAHA disponibles para webhooks:
+ * - message: Mensajes entrantes
+ * - message.any: TODOS los mensajes (entrantes y salientes desde móvil/web)
+ * - message.ack: Confirmaciones de entrega/lectura (sent, delivered, read)
+ * - message.reaction: Reacciones a mensajes (emojis)
+ * - message.revoked: Mensajes eliminados/revocados
+ * - message.waiting: Mensajes en espera
+ * - session.status: Cambios de estado de sesión (WORKING, FAILED, etc.)
+ * - presence.update: Actualizaciones de presencia (online, typing, etc.)
+ * - poll.vote: Votos en encuestas
+ * - call.received: Llamadas recibidas
+ * - call.accepted: Llamadas aceptadas
+ * - call.rejected: Llamadas rechazadas
+ * - group.join: Cuando alguien se une a un grupo
+ * - group.leave: Cuando alguien sale de un grupo
+ * - label.upsert: Etiquetas creadas/actualizadas
+ * - label.deleted: Etiquetas eliminadas
+ * - label.chat.added: Chat añadido a etiqueta
+ * - label.chat.deleted: Chat removido de etiqueta
+ */
+const WAHA_WEBHOOK_EVENTS = [
+  'message',
+  'message.any',
+  'message.ack',
+  'message.reaction',
+  'message.revoked',
+  'session.status',
+  'presence.update',
+  'poll.vote'
+];
+
+/**
  * Crear o iniciar sesión en WAHA
- * @param {string} sessionName - Nombre único de la sesión
- * @param {string} webhookUrl - URL para recibir webhooks
  */
 const createSessionWaha = async (sessionName, webhookUrl) => {
-  try {
+  return withRetry(async () => {
     const resp = await wahaClient.post('/api/sessions', {
       name: sessionName,
       start: true,
       config: {
+        // ✅ NOWEB Store - NECESARIO para sendSeen, getChats, getMessages
+        noweb: {
+          store: {
+            enabled: true,
+            fullSync: false  // false = 3 meses, true = 1 año de historial
+          }
+        },
         webhooks: [{
           url: webhookUrl,
-          events: ['message', 'message.ack', 'session.status'],
+          events: WAHA_WEBHOOK_EVENTS,
           hmac: null,
           retries: {
             attempts: 3,
@@ -45,26 +213,23 @@ const createSessionWaha = async (sessionName, webhookUrl) => {
           }
         }]
       }
-    })
+    }, { timeout: TIMEOUTS.session })
+
     return resp.data
-  } catch (error) {
-    console.error('Error creando sesión WAHA:', error.response?.data || error.message)
-    throw error
-  }
+  }, { context: 'createSession' })
 }
 
 /**
  * Reiniciar sesión para obtener nuevo QR
- * @param {string} sessionName
  */
 const restartSessionWaha = async (sessionName) => {
   try {
     // Primero detener la sesión
-    await wahaClient.post(`/api/sessions/${sessionName}/stop`).catch(() => {})
+    await wahaClient.post(`/api/sessions/${sessionName}/stop`, {}, { timeout: TIMEOUTS.session }).catch(() => {})
     // Esperar un momento
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await delay(1000)
     // Iniciar la sesión nuevamente
-    const resp = await wahaClient.post(`/api/sessions/${sessionName}/start`)
+    const resp = await wahaClient.post(`/api/sessions/${sessionName}/start`, {}, { timeout: TIMEOUTS.session })
     return resp.data
   } catch (error) {
     console.error('Error reiniciando sesión WAHA:', error.response?.data || error.message)
@@ -74,36 +239,30 @@ const restartSessionWaha = async (sessionName) => {
 
 /**
  * Obtener QR code para autenticación
- * @param {string} sessionName
- * @param {boolean} forceRestart - Si es true, reinicia la sesión para obtener nuevo QR
- * @returns {Promise<{value: string}>} QR en base64
  */
 const getQRCodeWaha = async (sessionName, forceRestart = false) => {
   try {
-    // Verificar estado de la sesión primero
     let sessionStatus
     try {
-      const statusResp = await wahaClient.get(`/api/sessions/${sessionName}`)
+      const statusResp = await wahaClient.get(`/api/sessions/${sessionName}`, { timeout: TIMEOUTS.session })
       sessionStatus = statusResp.data?.status
       console.log(`📊 [WAHA] Estado de sesión ${sessionName}: ${sessionStatus}`)
     } catch (e) {
       sessionStatus = 'UNKNOWN'
     }
 
-    // Si la sesión no está en SCAN_QR_CODE, necesitamos reiniciarla
     if (forceRestart || (sessionStatus !== 'SCAN_QR_CODE' && sessionStatus !== 'STARTING')) {
       console.log(`🔄 [WAHA] Reiniciando sesión para obtener nuevo QR...`)
       await restartSessionWaha(sessionName)
-      // Esperar a que la sesión esté lista para escanear
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await delay(2000)
     }
 
-    // Obtener QR
     const resp = await wahaClient.get(`/api/${sessionName}/auth/qr`, {
       params: { format: 'image' },
-      responseType: 'arraybuffer'
+      responseType: 'arraybuffer',
+      timeout: TIMEOUTS.session
     })
-    // Convertir a base64
+
     const base64 = Buffer.from(resp.data, 'binary').toString('base64')
     return { value: `data:image/png;base64,${base64}` }
   } catch (error) {
@@ -116,159 +275,257 @@ const getQRCodeWaha = async (sessionName, forceRestart = false) => {
 
 /**
  * Obtener estado de sesión
- * @param {string} sessionName
  */
 const getSessionStatusWaha = async (sessionName) => {
-  try {
-    const resp = await wahaClient.get(`/api/sessions/${sessionName}`)
+  return withRetry(async () => {
+    const resp = await wahaClient.get(`/api/sessions/${sessionName}`, { timeout: TIMEOUTS.session })
     return resp.data
-  } catch (error) {
-    throw error
-  }
+  }, { context: 'getSessionStatus', maxRetries: 2 })
 }
 
 /**
  * Detener sesión
- * @param {string} sessionName
  */
 const stopSessionWaha = async (sessionName) => {
-  try {
-    const resp = await wahaClient.post(`/api/sessions/${sessionName}/stop`)
-    return resp.data
-  } catch (error) {
-    throw error
-  }
+  const resp = await wahaClient.post(`/api/sessions/${sessionName}/stop`, {}, { timeout: TIMEOUTS.session })
+  return resp.data
 }
 
 /**
  * Eliminar sesión completamente
- * @param {string} sessionName
  */
 const deleteSessionWaha = async (sessionName) => {
-  try {
-    const resp = await wahaClient.delete(`/api/sessions/${sessionName}`)
+  const resp = await wahaClient.delete(`/api/sessions/${sessionName}`, { timeout: TIMEOUTS.session })
+  return resp.data
+}
+
+/**
+ * Actualizar configuración de webhook para una sesión existente
+ * Necesario para agregar eventos como message.any a sesiones ya creadas
+ * Usa la misma lista de eventos que createSessionWaha (WAHA_WEBHOOK_EVENTS)
+ */
+const updateSessionWebhookWaha = async (sessionName, webhookUrl) => {
+  return withRetry(async () => {
+    const resp = await wahaClient.put(`/api/sessions/${sessionName}`, {
+      config: {
+        webhooks: [{
+          url: webhookUrl,
+          events: WAHA_WEBHOOK_EVENTS,
+          hmac: null,
+          retries: {
+            attempts: 3,
+            delaySeconds: 2
+          }
+        }]
+      }
+    }, { timeout: TIMEOUTS.session })
+
+    console.log(`✅ [WAHA] Webhook actualizado para sesión ${sessionName} con eventos: ${WAHA_WEBHOOK_EVENTS.join(', ')}`)
     return resp.data
-  } catch (error) {
-    throw error
-  }
+  }, { context: 'updateSessionWebhook', maxRetries: 2 })
 }
 
 /**
  * Obtener información del usuario autenticado
- * @param {string} sessionName
  */
 const getMeWaha = async (sessionName) => {
+  const resp = await wahaClient.get(`/api/sessions/${sessionName}/me`, { timeout: TIMEOUTS.session })
+  return resp.data
+}
+
+/**
+ * Verificar si una sesión tiene NOWEB store habilitado
+ * El store es necesario para sendSeen, getChats, getMessages
+ * @returns {Object} { hasStore: boolean, storeEnabled: boolean, fullSync: boolean, sessionConfig: object }
+ */
+const checkSessionStoreEnabled = async (sessionName) => {
   try {
-    const resp = await wahaClient.get(`/api/sessions/${sessionName}/me`)
-    return resp.data
+    const resp = await wahaClient.get(`/api/sessions/${sessionName}`, { timeout: TIMEOUTS.session })
+    const config = resp.data?.config || {}
+    const nowebConfig = config.noweb || {}
+    const storeConfig = nowebConfig.store || {}
+
+    const result = {
+      sessionName,
+      status: resp.data?.status,
+      hasStore: !!storeConfig.enabled,
+      storeEnabled: storeConfig.enabled === true,
+      fullSync: storeConfig.fullSync === true,
+      sessionConfig: config
+    }
+
+    console.log(`📊 [WAHA] Store check para ${sessionName}:`, {
+      status: result.status,
+      storeEnabled: result.storeEnabled,
+      fullSync: result.fullSync
+    })
+
+    return result
   } catch (error) {
+    console.error(`❌ [WAHA] Error verificando store de ${sessionName}:`, error.message)
+    return {
+      sessionName,
+      status: 'UNKNOWN',
+      hasStore: false,
+      storeEnabled: false,
+      fullSync: false,
+      error: error.message
+    }
+  }
+}
+
+/**
+ * Recrear sesión con NOWEB store habilitado
+ * Útil para migrar sesiones antiguas que no tienen store
+ * ADVERTENCIA: Esto requiere volver a escanear el QR
+ */
+const recreateSessionWithStore = async (sessionName, webhookUrl) => {
+  console.log(`🔄 [WAHA] Recreando sesión ${sessionName} con store habilitado...`)
+
+  try {
+    // 1. Detener sesión existente (si existe)
+    try {
+      await stopSessionWaha(sessionName)
+      await delay(1000)
+    } catch (e) {
+      // Ignorar si no existe
+    }
+
+    // 2. Eliminar sesión existente
+    try {
+      await deleteSessionWaha(sessionName)
+      await delay(1000)
+    } catch (e) {
+      // Ignorar si no existe
+    }
+
+    // 3. Crear nueva sesión con store habilitado
+    const newSession = await createSessionWaha(sessionName, webhookUrl)
+
+    console.log(`✅ [WAHA] Sesión ${sessionName} recreada con store habilitado`)
+    return {
+      success: true,
+      session: newSession,
+      message: 'Sesión recreada. Escanea el QR nuevamente para conectar.'
+    }
+  } catch (error) {
+    console.error(`❌ [WAHA] Error recreando sesión ${sessionName}:`, error.message)
     throw error
   }
 }
 
-// ==================== MESSAGING ====================
+// ==================== MESSAGING (con retry y verificación de sesión) ====================
+
+/**
+ * Enviar mensaje con verificación de sesión y retry
+ */
+const sendWithSessionCheck = async (sessionName, sendFn, context) => {
+  // Verificar salud de la sesión antes de enviar
+  const health = await checkSessionHealth(sessionName)
+
+  if (!health.isHealthy) {
+    console.error(`❌ [WAHA] Sesión no saludable: ${health.error}`)
+    throw new Error(`SESSION_NOT_HEALTHY: ${health.error}`)
+  }
+
+  // Ejecutar envío con retry
+  return withRetry(sendFn, {
+    context,
+    maxRetries: RETRY_CONFIG.maxRetries,
+    onRetry: async (attempt, error) => {
+      // En cada retry, verificar si la sesión sigue activa
+      if (attempt > 0) {
+        const recheck = await checkSessionHealth(sessionName)
+        if (!recheck.isHealthy) {
+          throw new Error(`SESSION_DISCONNECTED: ${recheck.error}`)
+        }
+      }
+    }
+  })
+}
 
 /**
  * Enviar mensaje de texto
- * Similar a sendMessageTextGreen()
- * @param {string} sessionName
- * @param {string} chatId - Formato: 5212345678901@c.us
- * @param {string} text
  */
 const sendMessageTextWaha = async (sessionName, chatId, text) => {
-  try {
-    // Asegurar formato correcto
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendText', {
       session: sessionName,
       chatId: formattedChatId,
       text: text
-    })
+    }, { timeout: TIMEOUTS.message })
 
-    console.log('Mensaje enviado WAHA:', resp.data)
+    console.log('✅ [WAHA] Mensaje de texto enviado:', resp.data?.key?.id)
     return resp
-  } catch (error) {
-    console.error('Error enviando mensaje WAHA:', error.response?.data || error.message)
-    return null
-  }
+  }, 'sendText')
 }
 
 /**
  * Enviar mensaje de texto con quoted (respuesta)
- * Similar a sendMessageTextQuotedGreen()
  */
 const sendMessageTextQuotedWaha = async (sessionName, chatId, text, quotedMessageId) => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendText', {
       session: sessionName,
       chatId: formattedChatId,
       text: text,
       reply_to: quotedMessageId
-    })
+    }, { timeout: TIMEOUTS.message })
 
-    console.log('Mensaje quoted enviado WAHA:', resp.data)
+    console.log('✅ [WAHA] Mensaje quoted enviado:', resp.data?.key?.id)
     return resp
-  } catch (error) {
-    console.error('Error:', error.response?.data || error.message)
-    throw error
-  }
+  }, 'sendTextQuoted')
 }
 
 /**
  * Enviar imagen
- * @param {string} sessionName
- * @param {string} chatId
- * @param {string} url - URL de la imagen
- * @param {string} caption - Texto opcional
  */
 const sendMessageImageWaha = async (sessionName, chatId, url, caption = '') => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendImage', {
       session: sessionName,
       chatId: formattedChatId,
       file: { url: url },
       caption: caption
-    })
+    }, { timeout: TIMEOUTS.media })
 
+    console.log('✅ [WAHA] Imagen enviada:', resp.data?.key?.id)
     return resp
-  } catch (error) {
-    throw error
-  }
+  }, 'sendImage')
 }
 
 /**
  * Enviar video
  */
 const sendMessageVideoWaha = async (sessionName, chatId, url, caption = '') => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendVideo', {
       session: sessionName,
       chatId: formattedChatId,
       file: { url: url },
       caption: caption
-    })
+    }, { timeout: TIMEOUTS.media })
 
+    console.log('✅ [WAHA] Video enviado:', resp.data?.key?.id)
     return resp
-  } catch (error) {
-    throw error
-  }
+  }, 'sendVideo')
 }
 
 /**
  * Enviar documento
- * Similar a sendMessageMediaGreen()
  */
 const sendMessageDocumentWaha = async (sessionName, chatId, url, filename = '', caption = '') => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendFile', {
       session: sessionName,
       chatId: formattedChatId,
@@ -277,40 +534,38 @@ const sendMessageDocumentWaha = async (sessionName, chatId, url, filename = '', 
         filename: filename
       },
       caption: caption
-    })
+    }, { timeout: TIMEOUTS.media })
 
+    console.log('✅ [WAHA] Documento enviado:', resp.data?.key?.id)
     return resp
-  } catch (error) {
-    throw error
-  }
+  }, 'sendDocument')
 }
 
 /**
  * Enviar audio/voz
  */
 const sendMessageVoiceWaha = async (sessionName, chatId, url) => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendVoice', {
       session: sessionName,
       chatId: formattedChatId,
       file: { url: url }
-    })
+    }, { timeout: TIMEOUTS.media })
 
+    console.log('✅ [WAHA] Audio enviado:', resp.data?.key?.id)
     return resp
-  } catch (error) {
-    throw error
-  }
+  }, 'sendVoice')
 }
 
 /**
  * Enviar media con quoted (respuesta)
  */
 const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '', caption = '', quotedMessageId = '') => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendFile', {
       session: sessionName,
       chatId: formattedChatId,
@@ -320,131 +575,120 @@ const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '
       },
       caption: caption,
       reply_to: quotedMessageId
-    })
+    }, { timeout: TIMEOUTS.media })
 
+    console.log('✅ [WAHA] Media quoted enviada:', resp.data?.key?.id)
     return resp
-  } catch (error) {
-    throw error
-  }
+  }, 'sendMediaQuoted')
 }
 
 // ==================== STATUS & UTILITIES ====================
 
 /**
  * Marcar chat como leído
- * Similar a sendMarkReadGreen()
  */
 const sendMarkReadWaha = async (sessionName, chatId) => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  return withRetry(async () => {
     const resp = await wahaClient.post('/api/sendSeen', {
       session: sessionName,
       chatId: formattedChatId
-    })
+    }, { timeout: TIMEOUTS.message })
 
     return resp
-  } catch (error) {
-    throw error
-  }
+  }, { context: 'sendSeen', maxRetries: 2 })
 }
 
 /**
  * Verificar si número tiene WhatsApp
- * Similar a existWspGreen()
  */
 const checkNumberExistsWaha = async (sessionName, phoneNumber) => {
-  try {
+  return withRetry(async () => {
     const resp = await wahaClient.post('/api/checkNumberStatus', {
       session: sessionName,
       phoneNumber: phoneNumber
-    })
+    }, { timeout: TIMEOUTS.message })
 
     return resp
-  } catch (error) {
-    throw error
-  }
+  }, { context: 'checkNumber', maxRetries: 2 })
 }
 
 /**
  * Descargar media desde WAHA
- * @param {string} mediaUrl - URL del archivo (puede ser interna o pública)
- * @returns {Promise<Buffer>}
  */
 const downloadMediaWaha = async (mediaUrl) => {
-  try {
-    // Extraer el path del archivo (ej: /api/files/session_xxx/file.jpeg)
-    let downloadUrl = mediaUrl
+  let downloadUrl = mediaUrl
 
-    // Si la URL es interna (IP directa), convertir a URL pública
-    if (mediaUrl.includes('52.191.211.223') || mediaUrl.includes('localhost') || mediaUrl.includes('127.0.0.1')) {
-      const urlObj = new URL(mediaUrl)
-      const filePath = urlObj.pathname // /api/files/session_xxx/file.jpeg
-      downloadUrl = `${WAHA_BASE_URL}${filePath}`
-      console.log(`🔄 [WAHA] URL convertida: ${mediaUrl} -> ${downloadUrl}`)
-    }
+  // Si la URL es interna (IP directa), convertir a URL pública
+  if (mediaUrl.includes('52.191.211.223') || mediaUrl.includes('localhost') || mediaUrl.includes('127.0.0.1')) {
+    const urlObj = new URL(mediaUrl)
+    const filePath = urlObj.pathname
+    downloadUrl = `${WAHA_BASE_URL}${filePath}`
+    console.log(`🔄 [WAHA] URL convertida: ${mediaUrl} -> ${downloadUrl}`)
+  }
 
+  return withRetry(async () => {
     const resp = await axios.get(downloadUrl, {
       responseType: 'arraybuffer',
       headers: {
         'X-Api-Key': WAHA_API_KEY
       },
-      timeout: 60000
+      timeout: TIMEOUTS.download
     })
 
     return Buffer.from(resp.data)
-  } catch (error) {
-    console.error('Error descargando media:', error.message)
-    throw error
-  }
+  }, { context: 'downloadMedia', maxRetries: 2 })
 }
 
 /**
- * Editar mensaje (si WAHA lo soporta)
+ * Editar mensaje
  */
 const editMessageWaha = async (sessionName, chatId, messageId, newText) => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
-    // Nota: WAHA puede no soportar esto aún, verificar docs
+  return withRetry(async () => {
     const resp = await wahaClient.post('/api/editMessage', {
       session: sessionName,
       chatId: formattedChatId,
       messageId: messageId,
       text: newText
-    })
+    }, { timeout: TIMEOUTS.message })
 
     return resp
-  } catch (error) {
-    console.error('Error editando mensaje:', error.response?.data || error.message)
-    throw error
-  }
+  }, { context: 'editMessage' })
 }
 
 /**
  * Eliminar mensaje
  */
 const deleteMessageWaha = async (sessionName, chatId, messageId) => {
-  try {
-    const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
-    const resp = await wahaClient.delete('/api/deleteMessage', {
-      data: {
-        session: sessionName,
-        chatId: formattedChatId,
-        messageId: messageId
-      }
-    })
+  const resp = await wahaClient.delete('/api/deleteMessage', {
+    data: {
+      session: sessionName,
+      chatId: formattedChatId,
+      messageId: messageId
+    },
+    timeout: TIMEOUTS.message
+  })
 
-    return resp
-  } catch (error) {
-    throw error
-  }
+  return resp
 }
 
 // ==================== EXPORTS ====================
 
 module.exports = {
+  // Configuración
+  TIMEOUTS,
+  RETRY_CONFIG,
+  WAHA_WEBHOOK_EVENTS,
+
+  // Utilidades
+  checkSessionHealth,
+  withRetry,
+
   // Session Management
   createSessionWaha,
   getQRCodeWaha,
@@ -452,7 +696,10 @@ module.exports = {
   stopSessionWaha,
   restartSessionWaha,
   deleteSessionWaha,
+  updateSessionWebhookWaha,
   getMeWaha,
+  checkSessionStoreEnabled,    // Verificar si store está habilitado
+  recreateSessionWithStore,    // Recrear sesión con store
 
   // Messaging
   sendMessageTextWaha,
