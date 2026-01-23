@@ -683,14 +683,11 @@ const editMessageWaha = async (sessionName, chatId, messageId, newText) => {
 const deleteMessageWaha = async (sessionName, chatId, messageId) => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
-  const resp = await wahaClient.delete('/api/deleteMessage', {
-    data: {
-      session: sessionName,
-      chatId: formattedChatId,
-      messageId: messageId
-    },
-    timeout: TIMEOUTS.message
-  })
+  // WAHA usa la ruta: DELETE /api/{session}/chats/{chatId}/messages/{messageId}
+  const resp = await wahaClient.delete(
+    `/api/${sessionName}/chats/${formattedChatId}/messages/${messageId}`,
+    { timeout: TIMEOUTS.message }
+  )
 
   return resp
 }
