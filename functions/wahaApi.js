@@ -679,13 +679,21 @@ const editMessageWaha = async (sessionName, chatId, messageId, newText) => {
 
 /**
  * Eliminar mensaje
+ * @param {string} sessionName - Nombre de la sesión WAHA
+ * @param {string} chatId - ID del chat (número de teléfono)
+ * @param {string} messageId - ID corto del mensaje (wamid)
+ * @param {boolean} isOutgoing - true si es mensaje saliente, false si es entrante
  */
-const deleteMessageWaha = async (sessionName, chatId, messageId) => {
+const deleteMessageWaha = async (sessionName, chatId, messageId, isOutgoing = true) => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+
+  // WAHA requiere el messageId en formato: {fromMe}_{chatId}_{messageId}
+  // Ejemplo: true_51949002838@c.us_3EB0800A81B00A9917C466
+  const fullMessageId = `${isOutgoing}_${formattedChatId}_${messageId}`
 
   // WAHA usa la ruta: DELETE /api/{session}/chats/{chatId}/messages/{messageId}
   const resp = await wahaClient.delete(
-    `/api/${sessionName}/chats/${formattedChatId}/messages/${messageId}`,
+    `/api/${sessionName}/chats/${formattedChatId}/messages/${fullMessageId}`,
     { timeout: TIMEOUTS.message }
   )
 
