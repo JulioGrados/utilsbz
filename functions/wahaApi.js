@@ -182,6 +182,7 @@ const WAHA_WEBHOOK_EVENTS = [
   'message.ack',
   'message.reaction',
   'message.revoked',
+  'message.edited',    // Soporte para mensajes editados
   'session.status',
   'presence.update',
   'poll.vote'
