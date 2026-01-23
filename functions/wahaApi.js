@@ -661,17 +661,25 @@ const downloadMediaWaha = async (mediaUrl) => {
 
 /**
  * Editar mensaje
+ * @param {string} sessionName - Nombre de la sesión WAHA
+ * @param {string} chatId - ID del chat (número de teléfono)
+ * @param {string} messageId - ID corto del mensaje (wamid)
+ * @param {string} newText - Nuevo texto del mensaje
+ * @param {boolean} isOutgoing - true si es mensaje saliente, false si es entrante
  */
-const editMessageWaha = async (sessionName, chatId, messageId, newText) => {
+const editMessageWaha = async (sessionName, chatId, messageId, newText, isOutgoing = true) => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  // WAHA requiere el messageId en formato: {fromMe}_{chatId}_{messageId}
+  const fullMessageId = `${isOutgoing}_${formattedChatId}_${messageId}`
+
   return withRetry(async () => {
-    const resp = await wahaClient.post('/api/editMessage', {
-      session: sessionName,
-      chatId: formattedChatId,
-      messageId: messageId,
-      text: newText
-    }, { timeout: TIMEOUTS.message })
+    // WAHA usa PUT /api/{session}/chats/{chatId}/messages/{messageId}
+    const resp = await wahaClient.put(
+      `/api/${sessionName}/chats/${formattedChatId}/messages/${fullMessageId}`,
+      { text: newText },
+      { timeout: TIMEOUTS.message }
+    )
 
     return resp
   }, { context: 'editMessage' })
