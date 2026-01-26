@@ -482,14 +482,35 @@ const sendMessageTextWaha = async (sessionName, chatId, text) => {
 
 /**
  * Construir el ID del mensaje en formato que WAHA espera para reply_to
- * WAHA NOWEB requiere el ID exacto del mensaje original sin modificaciones
- * El ID debe coincidir exactamente con el que WhatsApp tiene almacenado
+ * WAHA NOWEB con LID requiere convertir el formato @lid a @s.whatsapp.net
+ *
+ * Formato entrada: false_99020605235316@lid_3EB055F9C118AB32B30553
+ * Formato salida: false_51949002838@s.whatsapp.net_3EB055F9C118AB32B30553
+ *
+ * @param {string} quotedMessageId - ID del mensaje original
+ * @param {string} phoneNumber - Número de teléfono del chat (ej: 51949002838)
  */
-const buildReplyToId = (quotedMessageId) => {
+const buildReplyToId = (quotedMessageId, phoneNumber) => {
   if (!quotedMessageId) return ''
 
-  // WAHA NOWEB necesita el ID exacto del mensaje original
-  // No modificar el formato - devolverlo tal cual
+  const parts = quotedMessageId.split('_')
+  if (parts.length >= 3) {
+    const fromMe = parts[0] // 'true' o 'false'
+    const shortId = parts[parts.length - 1] // El ID del mensaje (ej: 3EB055F9C118AB32B30553)
+
+    // Limpiar el número de teléfono (solo dígitos)
+    const cleanPhone = phoneNumber?.replace(/\D/g, '') || ''
+
+    if (cleanPhone) {
+      // Construir con formato @s.whatsapp.net que es el interno de WhatsApp
+      const formattedReplyTo = `${fromMe}_${cleanPhone}@s.whatsapp.net_${shortId}`
+      console.log(`📝 [WAHA] buildReplyToId: ${quotedMessageId} -> ${formattedReplyTo}`)
+      return formattedReplyTo
+    }
+  }
+
+  // Si no podemos convertir, devolver original
+  console.log(`📝 [WAHA] buildReplyToId: usando original: ${quotedMessageId}`)
   return quotedMessageId
 }
 
@@ -498,8 +519,10 @@ const buildReplyToId = (quotedMessageId) => {
  */
 const sendMessageTextQuotedWaha = async (sessionName, chatId, text, quotedMessageId) => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
-  // WAHA NOWEB necesita el ID exacto del mensaje original
-  const replyToId = buildReplyToId(quotedMessageId)
+  // Extraer el número de teléfono limpio del chatId
+  const phoneNumber = chatId.replace(/@.*$/, '').replace(/\D/g, '')
+  // WAHA NOWEB con LID requiere formato @s.whatsapp.net
+  const replyToId = buildReplyToId(quotedMessageId, phoneNumber)
 
   console.log(`📝 [WAHA] reply_to: ${replyToId}`)
 
@@ -599,8 +622,10 @@ const sendMessageVoiceWaha = async (sessionName, chatId, url) => {
  */
 const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '', caption = '', quotedMessageId = '') => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
-  // WAHA NOWEB necesita el ID exacto del mensaje original
-  const replyToId = buildReplyToId(quotedMessageId)
+  // Extraer el número de teléfono limpio del chatId
+  const phoneNumber = chatId.replace(/@.*$/, '').replace(/\D/g, '')
+  // WAHA NOWEB con LID requiere formato @s.whatsapp.net
+  const replyToId = buildReplyToId(quotedMessageId, phoneNumber)
 
   console.log(`📝 [WAHA] Media reply_to: ${replyToId}`)
 
