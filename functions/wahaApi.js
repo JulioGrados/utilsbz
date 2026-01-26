@@ -493,7 +493,20 @@ const getLidFromPhoneNumber = async (sessionName, phoneNumber) => {
       timeout: TIMEOUTS.default
     })
 
-    const lid = resp.data?.lid || resp.data
+    console.log(`📝 [WAHA] getLidFromPhoneNumber raw response:`, JSON.stringify(resp.data))
+
+    // La respuesta puede venir en diferentes formatos:
+    // { lid: "123456@lid" } o "123456@lid" o { data: { lid: "..." } }
+    // Si lid es null, devolvemos null para usar el fallback
+    let lid = null
+    if (typeof resp.data === 'string') {
+      lid = resp.data
+    } else if (resp.data?.lid && typeof resp.data.lid === 'string') {
+      lid = resp.data.lid
+    } else if (resp.data?.data?.lid && typeof resp.data.data.lid === 'string') {
+      lid = resp.data.data.lid
+    }
+
     console.log(`📝 [WAHA] getLidFromPhoneNumber: ${cleanPhone} -> ${lid}`)
     return lid
   } catch (error) {
@@ -518,8 +531,8 @@ const buildReplyToId = (quotedMessageId, phoneNumber, lid = null) => {
     const fromMe = parts[0] // 'true' o 'false'
     const shortId = parts[parts.length - 1] // El ID del mensaje
 
-    // Si tenemos el LID, usar formato @lid (como llegó originalmente)
-    if (lid) {
+    // Si tenemos el LID y es un string válido, usar formato @lid
+    if (lid && typeof lid === 'string') {
       const lidOnly = lid.replace(/@.*$/, '') // Extraer solo el número del LID
       const formattedReplyTo = `${fromMe}_${lidOnly}@lid_${shortId}`
       console.log(`📝 [WAHA] buildReplyToId con LID: ${quotedMessageId} -> ${formattedReplyTo}`)
