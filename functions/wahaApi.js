@@ -500,21 +500,44 @@ const extractShortMessageId = (fullMessageId) => {
 }
 
 /**
+ * Construir el ID del mensaje en formato que WAHA espera para reply_to
+ * El formato debe coincidir con el chatId al que estamos enviando
+ * Entrada: false_99020605235316@lid_3EB0EF8DB4E8F6F0C3F791, 51949002838@c.us
+ * Salida: false_51949002838@c.us_3EB0EF8DB4E8F6F0C3F791
+ */
+const buildReplyToId = (quotedMessageId, chatId) => {
+  if (!quotedMessageId) return ''
+
+  const parts = quotedMessageId.split('_')
+  if (parts.length >= 3) {
+    const fromMe = parts[0] // 'true' o 'false'
+    const shortId = parts[parts.length - 1] // El ID del mensaje
+
+    // Construir el nuevo formato usando el chatId al que enviamos
+    const formattedReplyTo = `${fromMe}_${chatId}_${shortId}`
+    return formattedReplyTo
+  }
+
+  // Si no tiene el formato esperado, devolver tal cual
+  return quotedMessageId
+}
+
+/**
  * Enviar mensaje de texto con quoted (respuesta)
  */
 const sendMessageTextQuotedWaha = async (sessionName, chatId, text, quotedMessageId) => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
-  // Extraer solo el ID corto del mensaje para reply_to
-  const shortMessageId = extractShortMessageId(quotedMessageId)
+  // Construir el reply_to con el formato correcto que coincida con el chatId
+  const replyToId = buildReplyToId(quotedMessageId, formattedChatId)
 
-  console.log(`📝 [WAHA] reply_to original: ${quotedMessageId} -> corto: ${shortMessageId}`)
+  console.log(`📝 [WAHA] reply_to original: ${quotedMessageId} -> formateado: ${replyToId}`)
 
   return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendText', {
       session: sessionName,
       chatId: formattedChatId,
       text: text,
-      reply_to: shortMessageId
+      reply_to: replyToId
     }, { timeout: TIMEOUTS.message })
 
     console.log('✅ [WAHA] Mensaje quoted enviado:', resp.data?.key?.id)
@@ -605,10 +628,10 @@ const sendMessageVoiceWaha = async (sessionName, chatId, url) => {
  */
 const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '', caption = '', quotedMessageId = '') => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
-  // Extraer solo el ID corto del mensaje para reply_to
-  const shortMessageId = extractShortMessageId(quotedMessageId)
+  // Construir el reply_to con el formato correcto que coincida con el chatId
+  const replyToId = buildReplyToId(quotedMessageId, formattedChatId)
 
-  console.log(`📝 [WAHA] Media reply_to original: ${quotedMessageId} -> corto: ${shortMessageId}`)
+  console.log(`📝 [WAHA] Media reply_to original: ${quotedMessageId} -> formateado: ${replyToId}`)
 
   return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendFile', {
@@ -619,7 +642,7 @@ const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '
         filename: filename
       },
       caption: caption,
-      reply_to: shortMessageId
+      reply_to: replyToId
     }, { timeout: TIMEOUTS.media })
 
     console.log('✅ [WAHA] Media quoted enviada:', resp.data?.key?.id)
