@@ -481,44 +481,15 @@ const sendMessageTextWaha = async (sessionName, chatId, text) => {
 }
 
 /**
- * Extraer el ID corto del mensaje desde el formato completo de WhatsApp
- * Formato: {direction}_{chatId}_{messageId}
- * Ejemplo: false_99020605235316@lid_3EB0A6FFE32526632302FC -> 3EB0A6FFE32526632302FC
- */
-const extractShortMessageId = (fullMessageId) => {
-  if (!fullMessageId) return ''
-
-  // Si el ID contiene underscore, extraer la última parte (el ID real del mensaje)
-  const parts = fullMessageId.split('_')
-  if (parts.length >= 3) {
-    // El ID del mensaje es la última parte
-    return parts[parts.length - 1]
-  }
-
-  // Si no tiene el formato esperado, devolver tal cual
-  return fullMessageId
-}
-
-/**
  * Construir el ID del mensaje en formato que WAHA espera para reply_to
- * El formato debe coincidir con el chatId al que estamos enviando
- * Entrada: false_99020605235316@lid_3EB0EF8DB4E8F6F0C3F791, 51949002838@c.us
- * Salida: false_51949002838@c.us_3EB0EF8DB4E8F6F0C3F791
+ * WAHA NOWEB requiere el ID exacto del mensaje original sin modificaciones
+ * El ID debe coincidir exactamente con el que WhatsApp tiene almacenado
  */
-const buildReplyToId = (quotedMessageId, chatId) => {
+const buildReplyToId = (quotedMessageId) => {
   if (!quotedMessageId) return ''
 
-  const parts = quotedMessageId.split('_')
-  if (parts.length >= 3) {
-    const fromMe = parts[0] // 'true' o 'false'
-    const shortId = parts[parts.length - 1] // El ID del mensaje
-
-    // Construir el nuevo formato usando el chatId al que enviamos
-    const formattedReplyTo = `${fromMe}_${chatId}_${shortId}`
-    return formattedReplyTo
-  }
-
-  // Si no tiene el formato esperado, devolver tal cual
+  // WAHA NOWEB necesita el ID exacto del mensaje original
+  // No modificar el formato - devolverlo tal cual
   return quotedMessageId
 }
 
@@ -527,10 +498,10 @@ const buildReplyToId = (quotedMessageId, chatId) => {
  */
 const sendMessageTextQuotedWaha = async (sessionName, chatId, text, quotedMessageId) => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
-  // Construir el reply_to con el formato correcto que coincida con el chatId
-  const replyToId = buildReplyToId(quotedMessageId, formattedChatId)
+  // WAHA NOWEB necesita el ID exacto del mensaje original
+  const replyToId = buildReplyToId(quotedMessageId)
 
-  console.log(`📝 [WAHA] reply_to original: ${quotedMessageId} -> formateado: ${replyToId}`)
+  console.log(`📝 [WAHA] reply_to: ${replyToId}`)
 
   return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendText', {
@@ -628,10 +599,10 @@ const sendMessageVoiceWaha = async (sessionName, chatId, url) => {
  */
 const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '', caption = '', quotedMessageId = '') => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
-  // Construir el reply_to con el formato correcto que coincida con el chatId
-  const replyToId = buildReplyToId(quotedMessageId, formattedChatId)
+  // WAHA NOWEB necesita el ID exacto del mensaje original
+  const replyToId = buildReplyToId(quotedMessageId)
 
-  console.log(`📝 [WAHA] Media reply_to original: ${quotedMessageId} -> formateado: ${replyToId}`)
+  console.log(`📝 [WAHA] Media reply_to: ${replyToId}`)
 
   return sendWithSessionCheck(sessionName, async () => {
     const resp = await wahaClient.post('/api/sendFile', {
