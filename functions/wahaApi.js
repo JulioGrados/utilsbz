@@ -733,10 +733,11 @@ const checkNumberExistsWaha = async (sessionName, phoneNumber) => {
 const downloadMediaWaha = async (mediaUrl) => {
   let downloadUrl = mediaUrl
 
-  // Si la URL es interna (IP directa), convertir a URL pública
-  if (mediaUrl.includes('52.191.211.223') || mediaUrl.includes('localhost') || mediaUrl.includes('127.0.0.1')) {
+  // Convertir URLs que apunten al servidor WAHA (público o IP) al host interno (WAHA_BASE_URL)
+  // WAHA envía URLs con dominio público que no se resuelve desde dentro de EasyPanel
+  if (mediaUrl.includes('appbizeus-waha-prod') || mediaUrl.includes('52.191.211.223') || mediaUrl.includes('localhost') || mediaUrl.includes('127.0.0.1')) {
     const urlObj = new URL(mediaUrl)
-    const filePath = urlObj.pathname
+    const filePath = urlObj.pathname + (urlObj.search || '')
     downloadUrl = `${WAHA_BASE_URL}${filePath}`
     console.log(`🔄 [WAHA] URL convertida: ${mediaUrl} -> ${downloadUrl}`)
   }
