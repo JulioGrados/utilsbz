@@ -718,10 +718,13 @@ const sendMarkReadWaha = async (sessionName, chatId) => {
  */
 const checkNumberExistsWaha = async (sessionName, phoneNumber) => {
   return withRetry(async () => {
-    const resp = await wahaClient.post('/api/checkNumberStatus', {
-      session: sessionName,
-      phoneNumber: phoneNumber
-    }, { timeout: TIMEOUTS.message })
+    const resp = await wahaClient.get('/api/contacts/check-exists', {
+      params: {
+        phone: phoneNumber,
+        session: sessionName
+      },
+      timeout: TIMEOUTS.message
+    })
 
     return resp
   }, { context: 'checkNumber', maxRetries: 2 })
