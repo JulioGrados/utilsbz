@@ -648,6 +648,8 @@ const sendMessageDocumentWaha = async (sessionName, chatId, url, filename = '', 
 
 /**
  * Enviar audio/voz
+ * Nota: convert: true es necesario para que funcione en Android
+ * ya que WhatsApp requiere formato OGG con codec Opus
  */
 const sendMessageVoiceWaha = async (sessionName, chatId, url) => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
@@ -656,7 +658,8 @@ const sendMessageVoiceWaha = async (sessionName, chatId, url) => {
     const resp = await wahaClient.post('/api/sendVoice', {
       session: sessionName,
       chatId: formattedChatId,
-      file: { url: url }
+      file: { url: url },
+      convert: true  // Convertir a OGG Opus para compatibilidad con Android
     }, { timeout: TIMEOUTS.media })
 
     console.log('✅ [WAHA] Audio enviado:', resp.data?.key?.id)
