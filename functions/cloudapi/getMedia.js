@@ -149,9 +149,8 @@ const setAudio = async (id, token, chat, message, file) => {
         recipient_type: 'individual',
         to: chat.mobile,
         type: 'audio',
-        document: {
-          link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
-          caption: message
+        audio: {
+          link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`
         }
       },
       headers: {
