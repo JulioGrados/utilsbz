@@ -182,10 +182,18 @@ const sendMedia = async (id, token, chat, message, file) => {
       throw new Error('No se pudo obtener datos del archivo');
     }
 
+    // Normalizar mimetype para Cloud API
+    // Cloud API acepta: audio/aac, audio/mp4, audio/mpeg, audio/amr, audio/ogg, audio/opus
+    // 'audio/mp3' no es estándar IANA, debe ser 'audio/mpeg'
+    let contentType = file.mimetype;
+    if (contentType === 'audio/mp3') {
+      contentType = 'audio/mpeg';
+    }
+
     const form = new FormData();
     form.append('file', bufferData, {
       filename: file.name,
-      contentType: file.mimetype
+      contentType: contentType
     });
     form.append('messaging_product', 'whatsapp');
 
