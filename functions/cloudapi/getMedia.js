@@ -167,8 +167,23 @@ const setAudio = async (id, token, chat, message, file) => {
 
 const sendMedia = async (id, token, chat, message, file) => {
   try {
+    // Reconstruir Buffer si viene serializado de Redis/BullMQ
+    // Cuando pasa por Redis, file.data se convierte en {type: 'Buffer', data: [...]}
+    let bufferData;
+    if (Buffer.isBuffer(file.data)) {
+      bufferData = file.data;
+    } else if (file.data && file.data.type === 'Buffer' && Array.isArray(file.data.data)) {
+      // Serializado desde Redis/BullMQ
+      bufferData = Buffer.from(file.data.data);
+    } else if (file.data) {
+      // Intentar convertir directamente
+      bufferData = Buffer.from(file.data);
+    } else {
+      throw new Error('No se pudo obtener datos del archivo');
+    }
+
     const form = new FormData();
-    form.append('file', file.data, {
+    form.append('file', bufferData, {
       filename: file.name,
       contentType: file.mimetype
     });
