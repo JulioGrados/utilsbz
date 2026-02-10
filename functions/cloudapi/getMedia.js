@@ -256,6 +256,79 @@ function obtenerTipoMensajeDesdeMime(mimetype) {
   return 'document'; // fallback por defecto
 }
 
+/**
+ * Obtener templates desde Meta API
+ * @param {string} wabaId - WhatsApp Business Account ID
+ * @param {string} token - Access Token
+ * @returns {Promise<Array>} - Lista de templates aprobados
+ */
+const getTemplates = async (wabaId, token) => {
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: `https://graph.facebook.com/v21.0/${wabaId}/message_templates`,
+      params: {
+        fields: 'name,status,language,category,components',
+        limit: 100
+      },
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    // Filtrar solo templates aprobados
+    const templates = response.data?.data || []
+    return templates.filter(t => t.status === 'APPROVED')
+  } catch (error) {
+    console.error('[getTemplates] Error:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+/**
+ * Enviar mensaje de template
+ * @param {string} phoneNumberId - Phone Number ID
+ * @param {string} token - Access Token
+ * @param {string} to - Numero destino (con codigo pais)
+ * @param {object} templateData - Datos del template
+ */
+const setTemplate = async (phoneNumberId, token, to, templateData) => {
+  try {
+    const { name, language, components } = templateData
+
+    const payload = {
+      messaging_product: 'whatsapp',
+      to: to,
+      type: 'template',
+      template: {
+        name: name,
+        language: { code: language }
+      }
+    }
+
+    // Agregar components si tienen parametros
+    if (components && components.length > 0) {
+      payload.template.components = components
+    }
+
+    console.log('[setTemplate] Enviando:', JSON.stringify(payload, null, 2))
+
+    const response = await axios({
+      method: 'POST',
+      url: `https://graph.facebook.com/v21.0/${phoneNumberId}/messages`,
+      data: payload,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    return response.data
+  } catch (error) {
+    console.error('[setTemplate] Error:', error.response?.data || error.message)
+    throw error
+  }
+}
 
 module.exports = {
   getMedia,
@@ -264,5 +337,7 @@ module.exports = {
   setVideo,
   setDocument,
   setAudio,
-  sendMedia
+  sendMedia,
+  getTemplates,
+  setTemplate
 }
