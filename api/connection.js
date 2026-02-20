@@ -96,6 +96,67 @@ const deleteWahaConnection = async id => {
   return remove(`/waha/${id}`)
 }
 
+// ==========================================
+// CLOUD API (Meta WhatsApp Business) FUNCTIONS
+// ==========================================
+
+/**
+ * Procesar Embedded Signup de Cloud API
+ * @param {Object} data - { code, company, teams, name, phoneNumberId, wabaId }
+ * @returns {Promise} { success: true, connection: {...} }
+ */
+const processCloudApiSignup = async data => {
+  return post('/cloudapi/signup', data)
+}
+
+/**
+ * Obtener estado de conexión Cloud API
+ * @param {Object} params - { connection: connectionId }
+ * @returns {Promise} { success: true, connection: {...}, tokenValid: boolean }
+ */
+const getCloudApiStatus = async params => {
+  return get('/cloudapi/status', params)
+}
+
+/**
+ * Obtener detalle de conexión Cloud API
+ * @param {string} id - ID de la conexión
+ * @param {Object} params - Parámetros adicionales
+ * @returns {Promise} Conexión
+ */
+const detailCloudApiConnection = async (id, params) => {
+  return getOne(`/cloudapi/${id}`, params)
+}
+
+/**
+ * Actualizar conexión Cloud API
+ * @param {string} id - ID de la conexión
+ * @param {Object} data - Datos a actualizar
+ * @returns {Promise} Conexión actualizada
+ */
+const updateCloudApiConnection = async (id, data) => {
+  return put(`/cloudapi/${id}`, data)
+}
+
+/**
+ * Eliminar conexión Cloud API
+ * @param {string} id - ID de la conexión
+ * @returns {Promise} { success: true }
+ */
+const deleteCloudApiConnection = async id => {
+  return remove(`/cloudapi/${id}`)
+}
+
+/**
+ * Listar números de teléfono de un WABA
+ * @param {string} wabaId - ID del WhatsApp Business Account
+ * @param {Object} params - { accessToken }
+ * @returns {Promise} { success: true, phoneNumbers: [...] }
+ */
+const listCloudApiPhoneNumbers = async (wabaId, params) => {
+  return get(`/cloudapi/waba/${wabaId}/phone-numbers`, params)
+}
+
 module.exports = {
   listConnections,
   setConnectionFB,
@@ -112,5 +173,12 @@ module.exports = {
   getWahaStatus,
   detailWahaConnection,
   updateWahaConnection,
-  deleteWahaConnection
+  deleteWahaConnection,
+  // Cloud API (Meta WhatsApp Business)
+  processCloudApiSignup,
+  getCloudApiStatus,
+  detailCloudApiConnection,
+  updateCloudApiConnection,
+  deleteCloudApiConnection,
+  listCloudApiPhoneNumbers
 }
