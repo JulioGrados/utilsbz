@@ -32,20 +32,30 @@ const getMedia = async (id, token) => {
   }
 }
 
-const setMessage = async (id, token, chat, message) => {
+const setMessage = async (id, token, chat, message, quotedMessageId = null) => {
   try {
+    const payload = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: chat.mobile,
+      type: 'text',
+      text: {
+        body: message
+      }
+    }
+
+    // Agregar context si hay mensaje citado
+    if (quotedMessageId) {
+      payload.context = {
+        message_id: quotedMessageId
+      }
+      console.log('[Cloud-API setMessage] Respondiendo a mensaje:', quotedMessageId)
+    }
+
     const response = await axios({
       method: 'POST',
       url: `https://graph.facebook.com/v21.0/${id}/messages`,
-      data: {
-        messaging_product: 'whatsapp',
-        recipient_type: 'individual',
-        to: chat.mobile,
-        type: 'text',
-        text: {
-          body: message
-        }
-      },
+      data: payload,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -165,7 +175,7 @@ const setAudio = async (id, token, chat, message, file) => {
   }
 }
 
-const sendMedia = async (id, token, chat, message, file) => {
+const sendMedia = async (id, token, chat, message, file, quotedMessageId = null) => {
   try {
     // Reconstruir Buffer si viene serializado de Redis/BullMQ
     // Cuando pasa por Redis, file.data se convierte en {type: 'Buffer', data: [...]}
@@ -240,6 +250,14 @@ const sendMedia = async (id, token, chat, message, file) => {
         id: mediaId
       }
     };
+
+    // Agregar context si hay mensaje citado
+    if (quotedMessageId) {
+      body.context = {
+        message_id: quotedMessageId
+      };
+      console.log('[Cloud-API sendMedia] Respondiendo a mensaje:', quotedMessageId);
+    }
 
     if (tipo === 'document') {
       body.document.filename = file.name;
@@ -352,6 +370,33 @@ const setTemplate = async (phoneNumberId, token, to, templateData) => {
   }
 }
 
+/**
+ * Eliminar un mensaje enviado
+ * IMPORTANTE: Solo funciona con mensajes enviados por ti, dentro del tiempo permitido
+ * @param {string} phoneNumberId - Phone Number ID
+ * @param {string} token - Access Token
+ * @param {string} messageId - WAMID del mensaje a eliminar
+ */
+const deleteMessage = async (phoneNumberId, token, messageId) => {
+  try {
+    console.log('[Cloud-API deleteMessage] Eliminando mensaje:', messageId)
+
+    const response = await axios({
+      method: 'DELETE',
+      url: `https://graph.facebook.com/v21.0/${phoneNumberId}/messages/${messageId}`,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    console.log('[Cloud-API deleteMessage] Mensaje eliminado:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('[Cloud-API deleteMessage] Error:', error.response?.data || error.message)
+    throw error
+  }
+}
+
 module.exports = {
   getMedia,
   setMessage,
@@ -361,5 +406,6 @@ module.exports = {
   setAudio,
   sendMedia,
   getTemplates,
-  setTemplate
+  setTemplate,
+  deleteMessage
 }
