@@ -189,15 +189,20 @@ const sendMedia = async (id, token, chat, message, file) => {
     });
 
     // Normalizar mimetype para Cloud API
+    // Tipos soportados: audio/aac, audio/mp4, audio/mpeg, audio/amr, audio/ogg, audio/opus,
+    // application/vnd.ms-powerpoint, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+    // application/vnd.openxmlformats-officedocument.presentationml.presentation, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+    // application/pdf, text/plain, application/vnd.ms-excel, image/jpeg, image/png, image/webp, video/mp4, video/3gpp
     let contentType = file.mimetype;
 
     // Mimetypes que necesitan normalización
     if (contentType === 'audio/mp3') {
       contentType = 'audio/mpeg';
     }
-    // CSV puede enviarse como text/csv o application/csv
+    // CSV NO está soportado por WhatsApp Cloud API, enviarlo como text/plain
     if (contentType === 'text/csv' || contentType === 'application/csv') {
-      contentType = 'text/csv';
+      contentType = 'text/plain';
+      console.log('[Cloud-API sendMedia] CSV convertido a text/plain para compatibilidad');
     }
 
     const form = new FormData();
