@@ -182,12 +182,22 @@ const sendMedia = async (id, token, chat, message, file) => {
       throw new Error('No se pudo obtener datos del archivo');
     }
 
+    console.log('[Cloud-API sendMedia] Archivo:', {
+      name: file.name,
+      mimetype: file.mimetype,
+      bufferSize: bufferData.length
+    });
+
     // Normalizar mimetype para Cloud API
-    // Cloud API acepta: audio/aac, audio/mp4, audio/mpeg, audio/amr, audio/ogg, audio/opus
-    // 'audio/mp3' no es estándar IANA, debe ser 'audio/mpeg'
     let contentType = file.mimetype;
+
+    // Mimetypes que necesitan normalización
     if (contentType === 'audio/mp3') {
       contentType = 'audio/mpeg';
+    }
+    // CSV puede enviarse como text/csv o application/csv
+    if (contentType === 'text/csv' || contentType === 'application/csv') {
+      contentType = 'text/csv';
     }
 
     const form = new FormData();
@@ -196,9 +206,12 @@ const sendMedia = async (id, token, chat, message, file) => {
       contentType: contentType
     });
     form.append('messaging_product', 'whatsapp');
+    form.append('type', contentType);
+
+    console.log('[Cloud-API sendMedia] Subiendo media con contentType:', contentType);
 
     const uploadResp = await axios.post(
-      `https://graph.facebook.com/v18.0/${id}/media`,
+      `https://graph.facebook.com/v21.0/${id}/media`,
       form,
       {
         headers: {
@@ -209,7 +222,7 @@ const sendMedia = async (id, token, chat, message, file) => {
     );
 
     const mediaId = uploadResp.data.id;
-    console.log('Media ID:', mediaId);
+    console.log('[Cloud-API sendMedia] Media ID:', mediaId);
 
     // Paso 2: Enviar el archivo
     const tipo = obtenerTipoMensajeDesdeMime(file.mimetype); // 'document', 'image', etc.
@@ -231,7 +244,7 @@ const sendMedia = async (id, token, chat, message, file) => {
     }
 
     const messageResp = await axios.post(
-      `https://graph.facebook.com/v18.0/${id}/messages`,
+      `https://graph.facebook.com/v21.0/${id}/messages`,
       body,
       {
         headers: {
@@ -241,9 +254,13 @@ const sendMedia = async (id, token, chat, message, file) => {
       }
     );
 
-    console.log('Mensaje enviado:', messageResp.data);
-    return  messageResp.data
+    console.log('[Cloud-API sendMedia] Mensaje enviado:', messageResp.data);
+    return messageResp.data
   } catch (error) {
+    // Mostrar el error real de Meta
+    if (error.response?.data?.error) {
+      console.error('[Cloud-API sendMedia] Error de Meta:', JSON.stringify(error.response.data.error, null, 2));
+    }
     throw error
   }
 }
