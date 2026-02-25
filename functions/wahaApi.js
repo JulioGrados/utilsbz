@@ -729,7 +729,7 @@ const checkNumberExistsWaha = async (sessionName, phoneNumber) => {
       timeout: TIMEOUTS.message
     })
 
-    return resp
+    return resp.data
   }, { context: 'checkNumber', maxRetries: 2 })
 }
 
