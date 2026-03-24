@@ -16,7 +16,7 @@ const TIMEOUTS = {
   message: 60000,      // 60s para envío de mensajes
   media: 120000,       // 120s para envío de media (archivos grandes)
   download: 90000,     // 90s para descarga de archivos
-  session: 45000       // 45s para operaciones de sesión
+  session: 60000       // 60s para operaciones de sesión (aumentado de 45s)
 }
 
 // Configuración de retry
@@ -25,6 +25,49 @@ const RETRY_CONFIG = {
   baseDelayMs: 1000,   // 1 segundo inicial
   maxDelayMs: 10000,   // máximo 10 segundos
   retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'ENOTFOUND', 'ENETUNREACH']
+}
+
+// ==================== CACHE DE HEALTH CHECK ====================
+
+/**
+ * Cache para evitar verificaciones de salud excesivas
+ * Estructura: { sessionName: { isHealthy: boolean, timestamp: number, data: object } }
+ */
+const healthCheckCache = {}
+const HEALTH_CHECK_CACHE_TTL = 60000 // 60 segundos de cache
+
+/**
+ * Obtener health check desde cache si es válido
+ */
+const getCachedHealthCheck = (sessionName) => {
+  const cached = healthCheckCache[sessionName]
+  if (cached && (Date.now() - cached.timestamp) < HEALTH_CHECK_CACHE_TTL) {
+    return cached
+  }
+  return null
+}
+
+/**
+ * Guardar resultado de health check en cache
+ */
+const setCachedHealthCheck = (sessionName, result) => {
+  healthCheckCache[sessionName] = {
+    ...result,
+    timestamp: Date.now()
+  }
+}
+
+/**
+ * Limpiar cache de health check para una sesión específica
+ * Útil cuando sabemos que la sesión cambió de estado
+ */
+const clearHealthCheckCache = (sessionName) => {
+  if (sessionName) {
+    delete healthCheckCache[sessionName]
+  } else {
+    // Limpiar todo el cache
+    Object.keys(healthCheckCache).forEach(key => delete healthCheckCache[key])
+  }
 }
 
 /**
@@ -127,8 +170,23 @@ const withRetry = async (fn, options = {}) => {
 
 /**
  * Verificar si la sesión está activa y saludable
+ * Usa cache para evitar verificaciones excesivas (TTL: 60 segundos)
  */
-const checkSessionHealth = async (sessionName) => {
+const checkSessionHealth = async (sessionName, forceCheck = false) => {
+  // Verificar cache primero (si no es forzado)
+  if (!forceCheck) {
+    const cached = getCachedHealthCheck(sessionName)
+    if (cached) {
+      console.log(`✅ [WAHA] Health check desde cache para ${sessionName} (válido por ${Math.round((HEALTH_CHECK_CACHE_TTL - (Date.now() - cached.timestamp)) / 1000)}s más)`)
+      return {
+        isHealthy: cached.isHealthy,
+        status: cached.status,
+        me: cached.me,
+        error: cached.error
+      }
+    }
+  }
+
   try {
     const resp = await wahaClient.get(`/api/sessions/${sessionName}`, {
       timeout: TIMEOUTS.session
@@ -137,13 +195,22 @@ const checkSessionHealth = async (sessionName) => {
     const status = resp.data?.status
     const isHealthy = status === 'WORKING'
 
-    return {
+    const result = {
       isHealthy,
       status,
       me: resp.data?.me,
       error: isHealthy ? null : `Sesión no está activa (estado: ${status})`
     }
+
+    // Guardar en cache solo si la sesión está saludable
+    if (isHealthy) {
+      setCachedHealthCheck(sessionName, result)
+      console.log(`✅ [WAHA] Health check actualizado en cache para ${sessionName}`)
+    }
+
+    return result
   } catch (error) {
+    // No guardar errores en cache para reintentar pronto
     return {
       isHealthy: false,
       status: 'UNKNOWN',
@@ -810,6 +877,42 @@ const deleteMessageWaha = async (sessionName, chatId, messageId, isOutgoing = tr
   return resp
 }
 
+// ==================== CONTACTS ====================
+
+/**
+ * Obtener foto de perfil de un contacto
+ * @param {string} sessionName - Nombre de la sesión WAHA
+ * @param {string} phoneNumber - Número de teléfono (sin @c.us)
+ * @returns {Object} { available: boolean, url: string | null }
+ */
+const getProfilePictureWaha = async (sessionName, phoneNumber) => {
+  try {
+    const cleanPhone = phoneNumber?.replace(/\D/g, '') || ''
+    if (!cleanPhone) return { available: false, url: null }
+
+    const contactId = `${cleanPhone}@c.us`
+
+    const resp = await wahaClient.get(`/api/${sessionName}/contacts/profile-picture`, {
+      params: { contactId },
+      timeout: TIMEOUTS.default
+    })
+
+    // WAHA devuelve { profilePictureURL: "https://..." } o error si no hay foto
+    if (resp.data?.profilePictureURL) {
+      return {
+        available: true,
+        url: resp.data.profilePictureURL
+      }
+    }
+
+    return { available: false, url: null }
+  } catch (error) {
+    // Si el contacto no tiene foto de perfil, WAHA devuelve 404
+    console.warn(`⚠️ [WAHA] No se pudo obtener foto de perfil para ${phoneNumber}:`, error.message)
+    return { available: false, url: null }
+  }
+}
+
 // ==================== EXPORTS ====================
 
 module.exports = {
@@ -817,9 +920,11 @@ module.exports = {
   TIMEOUTS,
   RETRY_CONFIG,
   WAHA_WEBHOOK_EVENTS,
+  HEALTH_CHECK_CACHE_TTL,
 
   // Utilidades
   checkSessionHealth,
+  clearHealthCheckCache,
   withRetry,
 
   // Session Management
@@ -850,5 +955,6 @@ module.exports = {
   editMessageWaha,
   deleteMessageWaha,
   getLidFromPhoneNumber,     // Obtener LID desde número de teléfono
-  buildReplyToId             // Construir reply_to ID para quoted
+  buildReplyToId,            // Construir reply_to ID para quoted
+  getProfilePictureWaha      // Obtener foto de perfil de contacto
 }
