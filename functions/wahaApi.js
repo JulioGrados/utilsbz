@@ -16,6 +16,7 @@ const TIMEOUTS = {
   message: 60000,      // 60s para envío de mensajes
   media: 120000,       // 120s para envío de media (archivos grandes)
   download: 90000,     // 90s para descarga de archivos
+  downloadVideo: 180000, // 180s (3 min) para descarga de videos
   session: 60000       // 60s para operaciones de sesión (aumentado de 45s)
 }
 
@@ -802,8 +803,14 @@ const checkNumberExistsWaha = async (sessionName, phoneNumber) => {
 
 /**
  * Descargar media desde WAHA
+ * @param {string} mediaUrl - URL del archivo en WAHA
+ * @param {Object} options - Opciones de descarga
+ * @param {string} options.mediaType - Tipo de media (video, image, audio, document)
+ * @param {number} options.initialDelay - Delay inicial antes de descargar (ms)
  */
-const downloadMediaWaha = async (mediaUrl) => {
+const downloadMediaWaha = async (mediaUrl, options = {}) => {
+  const { mediaType = 'image', initialDelay = 0 } = options
+
   let downloadUrl = mediaUrl
 
   // Convertir URLs que apunten al servidor WAHA (público o IP) al host interno (WAHA_BASE_URL)
@@ -815,17 +822,58 @@ const downloadMediaWaha = async (mediaUrl) => {
     console.log(`🔄 [WAHA] URL convertida: ${mediaUrl} -> ${downloadUrl}`)
   }
 
-  return withRetry(async () => {
-    const resp = await axios.get(downloadUrl, {
-      responseType: 'arraybuffer',
-      headers: {
-        'X-Api-Key': WAHA_API_KEY
-      },
-      timeout: TIMEOUTS.download
-    })
+  // Delay inicial para videos - WAHA necesita tiempo para procesar archivos grandes
+  const effectiveDelay = mediaType === 'video' ? Math.max(initialDelay, 2000) : initialDelay
+  if (effectiveDelay > 0) {
+    console.log(`⏳ [WAHA] Esperando ${effectiveDelay}ms antes de descargar ${mediaType}...`)
+    await delay(effectiveDelay)
+  }
 
-    return Buffer.from(resp.data)
-  }, { context: 'downloadMedia', maxRetries: 2 })
+  // Usar timeout más largo para videos
+  const timeout = mediaType === 'video' ? TIMEOUTS.downloadVideo : TIMEOUTS.download
+
+  // Retry con manejo especial de 404 (archivo puede no estar listo aún)
+  const maxRetries = mediaType === 'video' ? 4 : 3
+  let lastError = null
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const resp = await axios.get(downloadUrl, {
+        responseType: 'arraybuffer',
+        headers: {
+          'X-Api-Key': WAHA_API_KEY
+        },
+        timeout: timeout
+      })
+
+      console.log(`✅ [WAHA] Descarga exitosa en intento ${attempt + 1}/${maxRetries}`)
+      return Buffer.from(resp.data)
+    } catch (error) {
+      lastError = error
+      const status = error.response?.status
+
+      // Si es 404, el archivo puede no estar listo aún - esperar y reintentar
+      if (status === 404 && attempt < maxRetries - 1) {
+        const waitTime = (attempt + 1) * 2000 // 2s, 4s, 6s...
+        console.warn(`⚠️ [WAHA] 404 en intento ${attempt + 1}/${maxRetries}. Archivo no listo, esperando ${waitTime}ms...`)
+        await delay(waitTime)
+        continue
+      }
+
+      // Errores de red o timeout - reintentar con backoff
+      if (isRetryableError(error) && attempt < maxRetries - 1) {
+        const backoffMs = Math.min(1000 * Math.pow(2, attempt), 10000)
+        console.warn(`⚠️ [WAHA] Error ${error.code || error.message} en intento ${attempt + 1}/${maxRetries}. Reintentando en ${backoffMs}ms...`)
+        await delay(backoffMs)
+        continue
+      }
+
+      // Si no es retriable o se agotaron intentos, lanzar
+      throw error
+    }
+  }
+
+  throw lastError
 }
 
 /**
