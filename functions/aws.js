@@ -38,6 +38,7 @@ const saveFileAws = async (file, route) => {
         Bucket: bucketName,
         Key: formatFileName(fileroot),
         Body: file.data,
+        ContentType: file.mimetype || 'application/octet-stream'
     };
     try {
       const data = await client.send(new PutObjectCommand(params));
