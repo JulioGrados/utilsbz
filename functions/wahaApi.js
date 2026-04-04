@@ -5,6 +5,47 @@ const axios = require('axios')
  * Con retry automático, timeouts mejorados y manejo de sesiones
  */
 
+// Mapa de extensiones a mimetypes para documentos comunes
+const MIME_TYPES = {
+  // Documentos Office
+  'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'xls': 'application/vnd.ms-excel',
+  'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'doc': 'application/msword',
+  'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'ppt': 'application/vnd.ms-powerpoint',
+  // PDF
+  'pdf': 'application/pdf',
+  // Texto
+  'txt': 'text/plain',
+  'csv': 'text/csv',
+  // Imágenes
+  'jpg': 'image/jpeg',
+  'jpeg': 'image/jpeg',
+  'png': 'image/png',
+  'gif': 'image/gif',
+  'webp': 'image/webp',
+  // Audio
+  'mp3': 'audio/mpeg',
+  'ogg': 'audio/ogg',
+  'wav': 'audio/wav',
+  // Video
+  'mp4': 'video/mp4',
+  'webm': 'video/webm',
+  // Comprimidos
+  'zip': 'application/zip',
+  'rar': 'application/x-rar-compressed',
+}
+
+/**
+ * Obtiene el mimetype basado en la extensión del archivo
+ */
+const getMimeTypeFromFilename = (filename) => {
+  if (!filename) return null
+  const ext = filename.split('.').pop()?.toLowerCase()
+  return MIME_TYPES[ext] || null
+}
+
 // ==================== CONFIGURACIÓN ====================
 
 const WAHA_BASE_URL = process.env.WAHA_BASE_URL || 'https://appbizeus-waha-prod.m1imp2.easypanel.host'
@@ -698,18 +739,28 @@ const sendMessageVideoWaha = async (sessionName, chatId, url, caption = '') => {
 const sendMessageDocumentWaha = async (sessionName, chatId, url, filename = '', caption = '') => {
   const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
 
+  // Obtener mimetype basado en la extensión del archivo
+  const mimetype = getMimeTypeFromFilename(filename)
+
   return sendWithSessionCheck(sessionName, async () => {
+    const filePayload = {
+      url: url,
+      filename: filename
+    }
+
+    // Agregar mimetype si se detectó (evita que WAHA infiera incorrectamente)
+    if (mimetype) {
+      filePayload.mimetype = mimetype
+    }
+
     const resp = await wahaClient.post('/api/sendFile', {
       session: sessionName,
       chatId: formattedChatId,
-      file: {
-        url: url,
-        filename: filename
-      },
+      file: filePayload,
       caption: caption
     }, { timeout: TIMEOUTS.media })
 
-    console.log('✅ [WAHA] Documento enviado:', resp.data?.key?.id)
+    console.log('✅ [WAHA] Documento enviado:', resp.data?.key?.id, 'mimetype:', mimetype)
     return resp
   }, 'sendDocument')
 }
@@ -747,21 +798,31 @@ const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '
   const lid = await getLidFromPhoneNumber(sessionName, phoneNumber)
   const replyToId = buildReplyToId(quotedMessageId, phoneNumber, lid)
 
+  // Obtener mimetype basado en la extensión del archivo
+  const mimetype = getMimeTypeFromFilename(filename)
+
   console.log(`📝 [WAHA] Media reply_to: ${replyToId} (LID: ${lid || 'no disponible'})`)
 
   return sendWithSessionCheck(sessionName, async () => {
+    const filePayload = {
+      url: url,
+      filename: filename
+    }
+
+    // Agregar mimetype si se detectó
+    if (mimetype) {
+      filePayload.mimetype = mimetype
+    }
+
     const resp = await wahaClient.post('/api/sendFile', {
       session: sessionName,
       chatId: formattedChatId,
-      file: {
-        url: url,
-        filename: filename
-      },
+      file: filePayload,
       caption: caption,
       reply_to: replyToId
     }, { timeout: TIMEOUTS.media })
 
-    console.log('✅ [WAHA] Media quoted enviada:', resp.data?.key?.id)
+    console.log('✅ [WAHA] Media quoted enviada:', resp.data?.key?.id, 'mimetype:', mimetype)
     return resp
   }, 'sendMediaQuoted')
 }
