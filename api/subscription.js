@@ -12,6 +12,10 @@ const detailSubscription = async (id, params, jwt) => {
   return getOne(`/subscription/${id}`, params, jwt)
 }
 
+const detailMeSubscription = async (id, params) => {
+  return getOne(`/subscription/me/${id}`, params)
+}
+
 const updateSubscription = async (id, data) => {
   return put(`/subscription/${id}`, data)
 }
