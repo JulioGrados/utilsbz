@@ -1,0 +1,29 @@
+const { get, getOne, post, put, remove } = require('../lib/request')
+
+const listSubscriptions = async params => {
+  return get('/subscription', params)
+}
+
+const createSubscription = async data => {
+  return post('/subscription', data)
+}
+
+const detailSubscription = async (id, params, jwt) => {
+  return getOne(`/subscription/${id}`, params, jwt)
+}
+
+const updateSubscription = async (id, data) => {
+  return put(`/subscription/${id}`, data)
+}
+
+const removeSubscription = async id => {
+  return remove(`/subscription/${id}`)
+}
+
+module.exports = {
+  listSubscriptions,
+  createSubscription,
+  updateSubscription,
+  detailSubscription,
+  removeSubscription
+}
