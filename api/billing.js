@@ -1,42 +1,42 @@
-const { get, getOne, post, put, remove } = require('../lib/request')
+const { get, post, put } = require('../lib/request')
 
-const getPlans = asyn => {
+const getPlans = async () => {
   return get('/billing/plans')
 }
 
-const createCheckoutSession = async data => {
+const createCheckoutSession = async (data) => {
   return post('/billing/checkout', data)
 }
 
 const getProrationPreview = async (params) => {
-  return get(`/billing/proration-preview`, params)
+  return get('/billing/proration-preview', params)
 }
 
 const changePlan = async (data) => {
-  return post(`/billing/change-plan`, data)
+  return post('/billing/change-plan', data)
 }
 
-const cancelSubscription = async  => {
-  return post(`/billing/cancel`, {})
+const cancelSubscription = async () => {
+  return post('/billing/cancel', {})
 }
 
-const reactivateSubscription = async  => {
-  return post(`/billing/reactivate`, {})
+const reactivateSubscription = async () => {
+  return post('/billing/reactivate', {})
 }
 
-const createPortalSession = async  => {
-  return post(`/billing/portal`, {})
+const createPortalSession = async () => {
+  return post('/billing/portal', {})
 }
 
-const updateBillingInfo = async  => {
-  return put(`/billing/portal`, {})
+const updateBillingInfo = async (data) => {
+  return put('/billing/info', data)
 }
 
 module.exports = {
   getPlans,
   createCheckoutSession,
-  changePlan,
   getProrationPreview,
+  changePlan,
   cancelSubscription,
   reactivateSubscription,
   createPortalSession,
