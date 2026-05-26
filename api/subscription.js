@@ -24,11 +24,16 @@ const removeSubscription = async id => {
   return remove(`/subscription/${id}`)
 }
 
+const createManualSubscription = async data => {
+  return post('/subscription/manual', data)
+}
+
 module.exports = {
   listSubscriptions,
   createSubscription,
   updateSubscription,
   detailSubscription,
   detailMeSubscription,
-  removeSubscription
+  removeSubscription,
+  createManualSubscription
 }
