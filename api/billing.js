@@ -20,6 +20,10 @@ const cancelSubscription = async () => {
   return post('/billing/cancel', {})
 }
 
+const cancelManualSubscription = async () => {
+  return post('/billing/cancel-manual', {})
+}
+
 const reactivateSubscription = async () => {
   return post('/billing/reactivate', {})
 }
@@ -38,6 +42,7 @@ module.exports = {
   getProrationPreview,
   changePlan,
   cancelSubscription,
+  cancelManualSubscription,
   reactivateSubscription,
   createPortalSession,
   updateBillingInfo

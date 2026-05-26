@@ -28,6 +28,10 @@ const createManualSubscription = async data => {
   return post('/subscription/manual', data)
 }
 
+const triggerSubscriptionCheck = async () => {
+  return post('/subscription/trigger-check', {})
+}
+
 module.exports = {
   listSubscriptions,
   createSubscription,
@@ -35,5 +39,6 @@ module.exports = {
   detailSubscription,
   detailMeSubscription,
   removeSubscription,
-  createManualSubscription
+  createManualSubscription,
+  triggerSubscriptionCheck
 }
