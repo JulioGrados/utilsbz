@@ -308,6 +308,7 @@ const createSessionWaha = async (sessionName, webhookUrl) => {
       config: {
         // ✅ NOWEB Store - NECESARIO para sendSeen, getChats, getMessages
         noweb: {
+          markOnline: true,
           store: {
             enabled: true,
             fullSync: false  // false = 3 meses, true = 1 año de historial
