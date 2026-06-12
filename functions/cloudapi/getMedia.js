@@ -290,6 +290,68 @@ const sendMedia = async (id, token, chat, message, file, quotedMessageId = null)
   }
 }
 
+/**
+ * Enviar media por URL pública (link) sin subir buffer a Meta.
+ * Se usa cuando el archivo ya está en S3 y no hay buffer en memoria
+ * (ej. mensajes programados). El tipo se deriva del typeMsg de Bizeus.
+ * @param {string} id - Phone Number ID
+ * @param {string} token - Access Token
+ * @param {object} chat - Chat (usa chat.mobile)
+ * @param {string} message - Caption (image/video/document)
+ * @param {string} url - URL pública del archivo (HTTPS)
+ * @param {string} typeMsg - 'image' | 'video' | 'document' | 'audio'
+ * @param {string} name - Nombre de archivo (para documentos)
+ * @param {string|null} quotedMessageId - WAMID a citar
+ */
+const sendMediaByUrl = async (id, token, chat, message, url, typeMsg, name = '', quotedMessageId = null) => {
+  try {
+    const tipo = ['image', 'video', 'document', 'audio'].includes(typeMsg) ? typeMsg : 'document'
+
+    const body = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: chat.mobile,
+      type: tipo,
+      [tipo]: {
+        link: url
+      }
+    }
+
+    if (tipo === 'document') {
+      body.document.caption = message
+      if (name) body.document.filename = name
+    } else if (tipo === 'image' || tipo === 'video') {
+      body[tipo].caption = message
+    }
+    // audio: Meta ignora caption/filename
+
+    if (quotedMessageId) {
+      body.context = { message_id: quotedMessageId }
+      console.log('[Cloud-API sendMediaByUrl] Respondiendo a mensaje:', quotedMessageId)
+    }
+
+    console.log('[Cloud-API sendMediaByUrl] Enviando por link:', { tipo, url })
+
+    const response = await axios.post(
+      `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    return response.data
+  } catch (error) {
+    if (error.response?.data?.error) {
+      console.error('[Cloud-API sendMediaByUrl] Error de Meta:', JSON.stringify(error.response.data.error, null, 2))
+    }
+    throw error
+  }
+}
+
 // Helper para decidir el tipo de mensaje desde mimetype
 function obtenerTipoMensajeDesdeMime(mimetype) {
   if (mimetype.startsWith('image/')) return 'image';
@@ -407,6 +469,7 @@ module.exports = {
   setDocument,
   setAudio,
   sendMedia,
+  sendMediaByUrl,
   getTemplates,
   setTemplate,
   deleteMessage
