@@ -3,11 +3,13 @@
 const axios = require('axios')
 const FormData = require('form-data');
 
+const GRAPH_API_VERSION = process.env.GRAPH_API_VERSION || 'v22.0';
+
 const getMedia = async (id, token) => {
   try {
     const response = await axios({
       method: 'GET',
-      url: `https://graph.facebook.com/v21.0/${id}`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}`,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -54,7 +56,7 @@ const setMessage = async (id, token, chat, message, quotedMessageId = null) => {
 
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v21.0/${id}/messages`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: payload,
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +74,7 @@ const setImage = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v21.0/${id}/messages`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
@@ -99,7 +101,7 @@ const setVideo = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v21.0/${id}/messages`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
@@ -126,7 +128,7 @@ const setDocument = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v21.0/${id}/messages`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
@@ -153,7 +155,7 @@ const setAudio = async (id, token, chat, message, file) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v21.0/${id}/messages`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
@@ -226,7 +228,7 @@ const sendMedia = async (id, token, chat, message, file, quotedMessageId = null)
     console.log('[Cloud-API sendMedia] Subiendo media con contentType:', contentType);
 
     const uploadResp = await axios.post(
-      `https://graph.facebook.com/v21.0/${id}/media`,
+      `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/media`,
       form,
       {
         headers: {
@@ -267,7 +269,7 @@ const sendMedia = async (id, token, chat, message, file, quotedMessageId = null)
     }
 
     const messageResp = await axios.post(
-      `https://graph.facebook.com/v21.0/${id}/messages`,
+      `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       body,
       {
         headers: {
@@ -306,7 +308,7 @@ const getTemplates = async (wabaId, token) => {
   try {
     const response = await axios({
       method: 'GET',
-      url: `https://graph.facebook.com/v21.0/${wabaId}/message_templates`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${wabaId}/message_templates`,
       params: {
         fields: 'name,status,language,category,components',
         limit: 100
@@ -355,7 +357,7 @@ const setTemplate = async (phoneNumberId, token, to, templateData) => {
 
     const response = await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v21.0/${phoneNumberId}/messages`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${phoneNumberId}/messages`,
       data: payload,
       headers: {
         'Content-Type': 'application/json',
@@ -383,7 +385,7 @@ const deleteMessage = async (phoneNumberId, token, messageId) => {
 
     const response = await axios({
       method: 'DELETE',
-      url: `https://graph.facebook.com/v21.0/${phoneNumberId}/messages/${messageId}`,
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${phoneNumberId}/messages/${messageId}`,
       headers: {
         'Authorization': `Bearer ${token}`
       }
