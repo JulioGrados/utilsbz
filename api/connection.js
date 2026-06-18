@@ -157,6 +157,19 @@ const listCloudApiPhoneNumbers = async (wabaId, params) => {
   return get(`/cloudapi/waba/${wabaId}/phone-numbers`, params)
 }
 
+// ==========================================
+// TIKTOK (Business Messaging) FUNCTIONS
+// ==========================================
+
+/**
+ * Canjear el authorization code de TikTok y crear/actualizar la conexión
+ * @param {Object} data - { code, redirectUri?, company? }
+ * @returns {Promise} { success: true, connection: {...} }
+ */
+const exchangeTikTokConnection = async data => {
+  return post('/connection/tiktok/exchange', data)
+}
+
 module.exports = {
   listConnections,
   setConnectionFB,
@@ -180,5 +193,7 @@ module.exports = {
   detailCloudApiConnection,
   updateCloudApiConnection,
   deleteCloudApiConnection,
-  listCloudApiPhoneNumbers
+  listCloudApiPhoneNumbers,
+  // TikTok (Business Messaging)
+  exchangeTikTokConnection
 }
