@@ -92,18 +92,15 @@ const senderAction = async (businessId, conversationId, action, token) => {
   return data.data
 }
 
-const createWebhookConfig = async (businessId, callbackUrl, token) => {
-  const { data } = await axios.post(`${API_BASE}/business/message/webhook/create/`, {
-    business_id: businessId, callback_url: callbackUrl
-  }, { headers: { 'Access-Token': token, 'Content-Type': 'application/json' } })
-  return data
-}
-
-const subscribeEvents = async (businessId, token) => {
-  const { data } = await axios.post(`${API_BASE}/business/message/webhook/subscribe/`, {
-    business_id: businessId, events: ['im_receive_message', 'im_message_status']
-  }, { headers: { 'Access-Token': token, 'Content-Type': 'application/json' } })
-  return data
+// Suscribe/actualiza el webhook a NIVEL DE APP (auth con app_id+secret, no Access-Token).
+// Endpoint real: POST /business/webhook/update/  ·  event_type para DMs: 'DIRECT_MESSAGE'
+// (otros válidos: BRAND_MENTION, COMMENT, DEFAULT, VIDEO)
+const subscribeWebhook = async (callbackUrl, eventType = 'DIRECT_MESSAGE') => {
+  const { data } = await axios.post(`${API_BASE}/business/webhook/update/`, {
+    app_id: APP_ID, secret: APP_SECRET, event_type: eventType, callback_url: callbackUrl
+  }, { headers: { 'Content-Type': 'application/json' } })
+  if (data.code !== 0) throw data
+  return data.data // { app_id, callback_url, event_type }
 }
 
 module.exports = {
@@ -116,6 +113,5 @@ module.exports = {
   uploadImage,
   sendImage,
   senderAction,
-  createWebhookConfig,
-  subscribeEvents
+  subscribeWebhook
 }
