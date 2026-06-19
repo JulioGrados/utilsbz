@@ -71,6 +71,17 @@ const getMediaUrl = async (businessId, conversationId, messageId, mediaId, media
   return data.data // { download_url }
 }
 
+// Descarga los bytes de una download_url (de getMediaUrl) → Buffer.
+// VERIFICADO EN VIVO (2026-06-19): la CDN privada de DMs exige el header `x-user: <access_token>`
+// (la policy de la URL es {"vm":1,"th":"x-user"}); sin él devuelve 403 incluso desde región permitida.
+const downloadMedia = async (downloadUrl, token) => {
+  const { data } = await axios.get(downloadUrl, {
+    responseType: 'arraybuffer',
+    headers: { 'x-user': token }
+  })
+  return Buffer.from(data)
+}
+
 // Sube media SALIENTE (IMAGE | VIDEO) y devuelve { media_id } reutilizable en sendMedia.
 // VERIFICADO EN VIVO (2026-06-19): multipart POST .../business/message/media/upload/
 //   campos: business_id, media_type ('IMAGE'|'VIDEO'), file (binario). Solo mercados soportados.
@@ -133,6 +144,7 @@ module.exports = {
   getMessages,
   sendText,
   getMediaUrl,
+  downloadMedia,
   uploadMedia,
   sendMedia,
   senderAction,
