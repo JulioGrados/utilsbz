@@ -24,11 +24,17 @@ const removeMessage = async id => {
   return remove(`/messages/${id}`)
 }
 
+// Reaccionar a un mensaje (emoji '' elimina la reacción). Solo WhatsApp (WAHA / Cloud API).
+const reactMessage = async (id, emoji) => {
+  return post(`/messages/${id}/reaction`, { emoji })
+}
+
 module.exports = {
   listMessages,
   createMessage,
   createMessageMedia,
   updateMessage,
   detailMessage,
-  removeMessage
+  removeMessage,
+  reactMessage
 }

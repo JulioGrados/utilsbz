@@ -361,6 +361,45 @@ function obtenerTipoMensajeDesdeMime(mimetype) {
 }
 
 /**
+ * Reaccionar a un mensaje (o quitar la reacción con emoji = '')
+ * POST /{phoneNumberId}/messages  type: 'reaction'
+ * @param {string} id - Phone Number ID
+ * @param {string} token - Access Token
+ * @param {object} chat - Chat (usa chat.mobile como destinatario)
+ * @param {string} targetWamid - WAMID del mensaje al que se reacciona
+ * @param {string} emoji - Emoji. Cadena vacía '' elimina la reacción.
+ */
+const setReaction = async (id, token, chat, targetWamid, emoji = '') => {
+  try {
+    const response = await axios({
+      method: 'POST',
+      url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
+      data: {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: chat.mobile,
+        type: 'reaction',
+        reaction: {
+          message_id: targetWamid,
+          emoji: emoji || ''
+        }
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    return response.data
+  } catch (error) {
+    if (error.response?.data?.error) {
+      console.error('[Cloud-API setReaction] Error de Meta:', JSON.stringify(error.response.data.error, null, 2))
+    }
+    throw error
+  }
+}
+
+/**
  * Obtener templates desde Meta API
  * @param {string} wabaId - WhatsApp Business Account ID
  * @param {string} token - Access Token
@@ -470,6 +509,7 @@ module.exports = {
   setAudio,
   sendMedia,
   sendMediaByUrl,
+  setReaction,
   getTemplates,
   setTemplate,
   deleteMessage

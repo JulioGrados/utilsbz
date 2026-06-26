@@ -788,6 +788,28 @@ const sendMessageVoiceWaha = async (sessionName, chatId, url) => {
 }
 
 /**
+ * Reaccionar a un mensaje (o quitar la reacción con reaction = '')
+ * PUT /api/reaction  body: { session, messageId, reaction }
+ *
+ * @param {string} sessionName
+ * @param {string} messageId - ID serializado WAHA (ej: false_<chatId>@c.us_<shortId>).
+ *                             Usar buildReplyToId() si solo se tiene el id corto.
+ * @param {string} reaction - Emoji. Cadena vacía '' elimina la reacción.
+ */
+const setReactionWaha = async (sessionName, messageId, reaction = '') => {
+  return sendWithSessionCheck(sessionName, async () => {
+    const resp = await wahaClient.put('/api/reaction', {
+      session: sessionName,
+      messageId,
+      reaction
+    }, { timeout: TIMEOUTS.message })
+
+    console.log('✅ [WAHA] Reacción enviada:', { messageId, reaction: reaction || '(removida)' })
+    return resp
+  }, 'setReaction')
+}
+
+/**
  * Enviar media con quoted (respuesta)
  */
 const sendMessageMediaQuotedWaha = async (sessionName, chatId, url, filename = '', caption = '', quotedMessageId = '') => {
@@ -1057,6 +1079,7 @@ module.exports = {
   sendMessageDocumentWaha,
   sendMessageVoiceWaha,
   sendMessageMediaQuotedWaha,
+  setReactionWaha,
 
   // Status & Utilities
   sendMarkReadWaha,
