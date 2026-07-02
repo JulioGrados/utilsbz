@@ -2,6 +2,7 @@
 
 const axios = require('axios')
 const FormData = require('form-data');
+const { FILE_PUBLIC_BASE_URL } = require('../aws')
 
 const GRAPH_API_VERSION = process.env.GRAPH_API_VERSION || 'v22.0';
 
@@ -81,7 +82,7 @@ const setImage = async (id, token, chat, message, file) => {
         to: chat.mobile,
         type: 'image',
         image: {
-          link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
+          link: `${FILE_PUBLIC_BASE_URL}${file}`,
           caption: message
         }
       },
@@ -108,7 +109,7 @@ const setVideo = async (id, token, chat, message, file) => {
         to: chat.mobile,
         type: 'video',
         video: {
-          link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
+          link: `${FILE_PUBLIC_BASE_URL}${file}`,
           caption: message
         }
       },
@@ -135,7 +136,7 @@ const setDocument = async (id, token, chat, message, file) => {
         to: chat.mobile,
         type: 'document',
         document: {
-          link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`,
+          link: `${FILE_PUBLIC_BASE_URL}${file}`,
           caption: message
         }
       },
@@ -162,7 +163,7 @@ const setAudio = async (id, token, chat, message, file) => {
         to: chat.mobile,
         type: 'audio',
         audio: {
-          link: `https://bizeus-test.s3.us-east-2.amazonaws.com${file}`
+          link: `${FILE_PUBLIC_BASE_URL}${file}`
         }
       },
       headers: {

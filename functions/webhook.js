@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { FILE_PUBLIC_BASE_URL } = require('./aws')
 
 const sendTextWebhook = async (connection, mobileCode, mobile, message, url, mood) => {
     try {
@@ -38,7 +39,7 @@ const sendMediaWebhook = async (chatId, connection, typeMsg, mobileCode, mobile,
                 mobile: mobile,
                 caption: message,
                 fileName: fileName ? fileName : '',
-                file: file ? `https://bizeus-test.s3.us-east-2.amazonaws.com${file}` : '',
+                file: file ? `${FILE_PUBLIC_BASE_URL}${file}` : '',
                 mood: mood, 
                 contact: contact
             },

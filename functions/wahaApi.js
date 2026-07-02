@@ -1079,7 +1079,6 @@ module.exports = {
   sendMessageDocumentWaha,
   sendMessageVoiceWaha,
   sendMessageMediaQuotedWaha,
-  setReactionWaha,
 
   // Status & Utilities
   sendMarkReadWaha,
