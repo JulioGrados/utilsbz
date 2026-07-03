@@ -626,6 +626,38 @@ const getLidFromPhoneNumber = async (sessionName, phoneNumber) => {
 }
 
 /**
+ * Resolver el teléfono real a partir de un LID (identificador que WhatsApp usa para ocultar el número).
+ * GET /api/{session}/lids/{lid}  ->  { lid: "99020605235316@lid", pn: "51949002838@c.us" }
+ * Necesario porque el webhook de mensaje entrante NO incluye el teléfono cuando el remitente viene como @lid.
+ * Devuelve solo los dígitos del teléfono (ej: "51949002838") o null si no se pudo resolver.
+ */
+const getPhoneNumberFromLid = async (sessionName, lid) => {
+  try {
+    const cleanLid = (lid || '').toString().replace('@lid', '').replace(/[^0-9]/g, '')
+    if (!cleanLid) return null
+
+    const resp = await wahaClient.get(`/api/${sessionName}/lids/${cleanLid}`, {
+      timeout: TIMEOUTS.default
+    })
+
+    // La respuesta esperada: { lid: "..@lid", pn: "51949002838@c.us" }
+    let pn = null
+    if (resp.data?.pn && typeof resp.data.pn === 'string') {
+      pn = resp.data.pn
+    } else if (resp.data?.data?.pn && typeof resp.data.data.pn === 'string') {
+      pn = resp.data.data.pn
+    }
+
+    const phone = pn ? pn.split('@')[0] : null
+    console.log(`📝 [WAHA] getPhoneNumberFromLid: ${cleanLid} -> ${phone}`)
+    return phone
+  } catch (error) {
+    console.warn(`⚠️ [WAHA] No se pudo resolver el LID ${lid}:`, error.message)
+    return null
+  }
+}
+
+/**
  * Construir el ID del mensaje en formato que WAHA espera para reply_to
  * Intenta múltiples formatos porque WAHA NOWEB con LID puede necesitar formato específico
  *
@@ -1087,6 +1119,7 @@ module.exports = {
   editMessageWaha,
   deleteMessageWaha,
   getLidFromPhoneNumber,     // Obtener LID desde número de teléfono
+  getPhoneNumberFromLid,     // Resolver teléfono real desde un LID (entrantes @lid)
   buildReplyToId,            // Construir reply_to ID para quoted
   getProfilePictureWaha      // Obtener foto de perfil de contacto
 }
