@@ -8,6 +8,7 @@ const reducers = require('./functions/reducers')
 const transform = require('./functions/transform')
 const user = require('./functions/user')
 const wahaApi = require('./functions/wahaApi')
+const zadarma = require('./functions/zadarmaApi')
 
 module.exports = {
   log,
@@ -18,5 +19,7 @@ module.exports = {
   transform,
   user,
   // WAHA API
-  ...wahaApi
+  ...wahaApi,
+  // Zadarma (telefonía) — namespaced para evitar colisiones de nombres (callback/request)
+  zadarma
 }
