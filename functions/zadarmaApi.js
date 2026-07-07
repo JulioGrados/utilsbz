@@ -67,10 +67,17 @@ const buildParamsString = (params = {}) => {
 }
 
 /**
- * Firma base64( hmac_sha1(signatureString, secret) ). Reutilizable para verificar webhooks.
+ * Firma al estilo de la lib oficial de Zadarma (PHP):
+ *   base64_encode( hash_hmac('sha1', data, secret) )
+ * OJO: en PHP `hash_hmac` devuelve un string HEX de 40 chars por defecto, y el base64 se aplica sobre
+ * ESE string hex (NO sobre los 20 bytes crudos). Replicarlo exactamente o Zadarma responde
+ * 401 "Not authorized". Reutilizable para verificar webhooks.
  */
 const signString = (signatureString, secret) =>
-  crypto.createHmac('sha1', secret).update(signatureString).digest('base64')
+  Buffer.from(
+    crypto.createHmac('sha1', secret).update(signatureString).digest('hex'),
+    'utf8'
+  ).toString('base64')
 
 /**
  * Cabecera Authorization para una petición firmada.
