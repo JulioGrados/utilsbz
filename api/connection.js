@@ -169,6 +169,34 @@ const exchangeTikTokConnection = async data => {
   return post('/connection/tiktok/exchange', data)
 }
 
+// ==========================================
+// ZADARMA (telefonía / llamadas)
+// ==========================================
+/**
+ * Crear conexión Zadarma (credenciales por empresa)
+ * @param {Object} data - { name, zadarmaKey, zadarmaSecret, extensions: [{ sip, user }] }
+ */
+const createZadarmaConnection = async data => {
+  return post('/connection/zadarma', data)
+}
+
+/**
+ * Obtener la clave temporal del softphone WebRTC para el agente logueado (vive 72h)
+ * @returns {Promise} { key, sip }
+ */
+const getZadarmaWebrtcKey = async params => {
+  return get('/zadarma/webrtc-key', params)
+}
+
+/**
+ * Iniciar una llamada al contacto del chat (click-to-call: Zadarma timbra la extensión SIP
+ * del agente —que suena en el widget WebRTC— y la conecta con el contacto)
+ * @param {Object} data - { chatId }
+ */
+const requestZadarmaCall = async data => {
+  return post('/zadarma/call', data)
+}
+
 module.exports = {
   listConnections,
   setConnectionFB,
@@ -194,5 +222,9 @@ module.exports = {
   deleteCloudApiConnection,
   listCloudApiPhoneNumbers,
   // TikTok (Business Messaging)
-  exchangeTikTokConnection
+  exchangeTikTokConnection,
+  // Zadarma (telefonía)
+  createZadarmaConnection,
+  getZadarmaWebrtcKey,
+  requestZadarmaCall
 }
