@@ -1118,6 +1118,7 @@ module.exports = {
   downloadMediaWaha,
   editMessageWaha,
   deleteMessageWaha,
+  setReactionWaha,           // Reaccionar a un mensaje (emoji '' elimina la reacción)
   getLidFromPhoneNumber,     // Obtener LID desde número de teléfono
   getPhoneNumberFromLid,     // Resolver teléfono real desde un LID (entrantes @lid)
   buildReplyToId,            // Construir reply_to ID para quoted
