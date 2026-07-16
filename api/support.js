@@ -25,10 +25,42 @@ const readSupportMessages = async data => {
   return put('/support/read', data)
 }
 
+// --- Bandeja de soporte (dashbz, solo staff de Bizeus) ---
+
+// lista de conversaciones de soporte (populadas con user y company)
+const listSupportInbox = async params => {
+  return get('/support/inbox', params)
+}
+
+// histórico de una conversación: params = { sort, limit, skip }
+const listSupportInboxMessages = async (id, params) => {
+  return get(`/support/inbox/${id}/messages`, params)
+}
+
+// responder como agente: data = { supportChat, text }
+const replySupportMessage = async data => {
+  return post('/support/reply', data)
+}
+
+// marcar leídos los mensajes del usuario (countAgent → 0)
+const readSupportInbox = async id => {
+  return put(`/support/inbox/${id}/read`, {})
+}
+
+// cambiar estado: data = { status: 'abierto' | 'resuelto' }
+const updateSupportStatus = async (id, data) => {
+  return put(`/support/inbox/${id}/status`, data)
+}
+
 module.exports = {
   getSupportChat,
   listSupportMessages,
   createSupportMessage,
   createSupportMessageMedia,
-  readSupportMessages
+  readSupportMessages,
+  listSupportInbox,
+  listSupportInboxMessages,
+  replySupportMessage,
+  readSupportInbox,
+  updateSupportStatus
 }
