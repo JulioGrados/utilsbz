@@ -42,6 +42,11 @@ const replySupportMessage = async data => {
   return post('/support/reply', data)
 }
 
+// respuesta con adjunto: data = FormData con 'file' (binario) y 'data' (JSON string: { supportChat, typeMsg, text? })
+const replySupportMessageMedia = async data => {
+  return post('/support/reply/media', data)
+}
+
 // marcar leídos los mensajes del usuario (countAgent → 0)
 const readSupportInbox = async id => {
   return put(`/support/inbox/${id}/read`, {})
@@ -61,6 +66,7 @@ module.exports = {
   listSupportInbox,
   listSupportInboxMessages,
   replySupportMessage,
+  replySupportMessageMedia,
   readSupportInbox,
   updateSupportStatus
 }
