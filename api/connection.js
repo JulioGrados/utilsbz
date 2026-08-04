@@ -170,6 +170,18 @@ const exchangeTikTokConnection = async data => {
 }
 
 // ==========================================
+// TELEGRAM (Bot API)
+// ==========================================
+/**
+ * Crear conexión Telegram (el usuario pega el bot token de BotFather)
+ * @param {Object} data - { botToken, name?, company, teams? }
+ * @returns {Promise} { success: true, connection: {...} }
+ */
+const createTelegramConnection = async data => {
+  return post('/connection/telegram', data)
+}
+
+// ==========================================
 // ZADARMA (telefonía / llamadas)
 // ==========================================
 /**
@@ -223,6 +235,8 @@ module.exports = {
   listCloudApiPhoneNumbers,
   // TikTok (Business Messaging)
   exchangeTikTokConnection,
+  // Telegram (Bot API)
+  createTelegramConnection,
   // Zadarma (telefonía)
   createZadarmaConnection,
   getZadarmaWebrtcKey,
