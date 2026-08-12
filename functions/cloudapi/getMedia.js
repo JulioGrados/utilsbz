@@ -6,6 +6,35 @@ const { FILE_PUBLIC_BASE_URL } = require('../aws')
 
 const GRAPH_API_VERSION = process.env.GRAPH_API_VERSION || 'v22.0';
 
+/**
+ * BSUID (business-scoped user ID) de Cloud API: código ISO de país + '.' +
+ * alfanumérico, p. ej. `PE.13491208655302741918` (las cuentas padre llevan ENT).
+ */
+const isBsuid = (value) =>
+  typeof value === 'string' && /^[A-Za-z]{2}\.(ENT\.)?[A-Za-z0-9]{1,128}$/.test(value.trim())
+
+/**
+ * Destinatario del mensaje.
+ *
+ * Desde 2026 un usuario puede ocultar su número usando un username: entonces
+ * Meta ya no manda `wa_id`/`from` y solo se le puede escribir por su BSUID, que
+ * viaja en `recipient` (NO en `to`). Para el resto de chats el resultado es
+ * exactamente el de siempre: `{ to: chat.mobile }`.
+ *
+ * @param {object} chat - usa chat.mobile y, si existe, chat.waUserId
+ */
+const buildRecipient = (chat) => {
+  const mobile = (chat?.mobile || '').toString().trim()
+  const waUserId = (chat?.waUserId || '').toString().trim()
+
+  if (mobile && !isBsuid(mobile)) return { to: mobile }
+
+  const bsuid = waUserId || mobile
+  if (bsuid) return { recipient: bsuid, recipient_type: 'individual' }
+
+  return { to: mobile }
+}
+
 const getMedia = async (id, token) => {
   try {
     const response = await axios({
@@ -39,8 +68,7 @@ const setMessage = async (id, token, chat, message, quotedMessageId = null) => {
   try {
     const payload = {
       messaging_product: 'whatsapp',
-      recipient_type: 'individual',
-      to: chat.mobile,
+      ...buildRecipient(chat),
       type: 'text',
       text: {
         body: message
@@ -78,8 +106,7 @@ const setImage = async (id, token, chat, message, file) => {
       url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
-        recipient_type: 'individual',
-        to: chat.mobile,
+        ...buildRecipient(chat),
         type: 'image',
         image: {
           link: `${FILE_PUBLIC_BASE_URL}${file}`,
@@ -105,8 +132,7 @@ const setVideo = async (id, token, chat, message, file) => {
       url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
-        recipient_type: 'individual',
-        to: chat.mobile,
+        ...buildRecipient(chat),
         type: 'video',
         video: {
           link: `${FILE_PUBLIC_BASE_URL}${file}`,
@@ -132,8 +158,7 @@ const setDocument = async (id, token, chat, message, file) => {
       url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
-        recipient_type: 'individual',
-        to: chat.mobile,
+        ...buildRecipient(chat),
         type: 'document',
         document: {
           link: `${FILE_PUBLIC_BASE_URL}${file}`,
@@ -159,8 +184,7 @@ const setAudio = async (id, token, chat, message, file) => {
       url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
-        recipient_type: 'individual',
-        to: chat.mobile,
+        ...buildRecipient(chat),
         type: 'audio',
         audio: {
           link: `${FILE_PUBLIC_BASE_URL}${file}`
@@ -247,7 +271,7 @@ const sendMedia = async (id, token, chat, message, file, quotedMessageId = null)
 
     const body = {
       messaging_product: 'whatsapp',
-      to: chat.mobile,
+      ...buildRecipient(chat),
       type: tipo,
       [tipo]: {
         id: mediaId
@@ -310,8 +334,7 @@ const sendMediaByUrl = async (id, token, chat, message, url, typeMsg, name = '',
 
     const body = {
       messaging_product: 'whatsapp',
-      recipient_type: 'individual',
-      to: chat.mobile,
+      ...buildRecipient(chat),
       type: tipo,
       [tipo]: {
         link: url
@@ -377,8 +400,7 @@ const setReaction = async (id, token, chat, targetWamid, emoji = '') => {
       url: `https://graph.facebook.com/${GRAPH_API_VERSION}/${id}/messages`,
       data: {
         messaging_product: 'whatsapp',
-        recipient_type: 'individual',
-        to: chat.mobile,
+        ...buildRecipient(chat),
         type: 'reaction',
         reaction: {
           message_id: targetWamid,
@@ -502,6 +524,8 @@ const deleteMessage = async (phoneNumberId, token, messageId) => {
 }
 
 module.exports = {
+  buildRecipient,
+  isBsuid,
   getMedia,
   setMessage,
   setImage,
