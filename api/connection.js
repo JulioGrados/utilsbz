@@ -68,6 +68,20 @@ const getWahaStatus = async params => {
 }
 
 /**
+ * Recrear la sesión WAHA (stop + delete + create)
+ *
+ * ⚠️ ACCIÓN DESTRUCTIVA: desvincula el dispositivo y obliga a escanear el QR de
+ * nuevo. Pídele confirmación al usuario antes de llamarla. Sólo tiene sentido
+ * cuando la sesión está FAILED (el QR responde con needsRecreate: true).
+ *
+ * @param {Object} params - { connection: connectionId }
+ * @returns {Promise} { success: true, message: "Sesión recreada..." }
+ */
+const recreateWahaSession = async params => {
+  return post('/waha/session/recreate', params)
+}
+
+/**
  * Obtener detalle de conexión WAHA
  * @param {string} id - ID de la conexión
  * @param {Object} params - Parámetros adicionales
@@ -223,6 +237,7 @@ module.exports = {
   createWahaConnection,
   getWahaQRCode,
   getWahaStatus,
+  recreateWahaSession,
   detailWahaConnection,
   updateWahaConnection,
   deleteWahaConnection,
