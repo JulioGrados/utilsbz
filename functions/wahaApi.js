@@ -934,6 +934,42 @@ const checkNumberExistsWaha = async (sessionName, phoneNumber) => {
 }
 
 /**
+ * Ids de los últimos mensajes de un chat.
+ *
+ * Sirve para comprobar si dos direcciones (`<lid>@lid` y `<telefono>@c.us`) son
+ * la MISMA conversación: WhatsApp sirve los mismos mensajes bajo ambas cuando
+ * corresponden a la misma persona. Es una verificación independiente del store
+ * de mapeos `/lids`, que muchas veces está vacío.
+ *
+ * @returns {Promise<{ids: string[], error: string|null}>}
+ *          ids vacío sin error = el chat existe pero no tiene mensajes, o no
+ *          hay conversación bajo esa dirección (no concluyente, no es un fallo).
+ */
+const getChatMessageIdsWaha = async (sessionName, chatId, limit = 10) => {
+  try {
+    const resp = await wahaClient.get(
+      `/api/${sessionName}/chats/${encodeURIComponent(chatId)}/messages`,
+      { params: { limit, downloadMedia: false }, timeout: TIMEOUTS.default }
+    )
+
+    const mensajes = Array.isArray(resp.data) ? resp.data : []
+    const ids = mensajes
+      .map(m => (m._data && m._data.key && m._data.key.id) || m.id)
+      .filter(Boolean)
+      .map(String)
+
+    return { ids, error: null }
+  } catch (error) {
+    // Un 404 es "no existe ese chat", que para la verificación es un resultado
+    // válido (no concluyente), no un fallo de la consulta.
+    if (error.response && error.response.status === 404) return { ids: [], error: null }
+
+    console.warn(`⚠️ [WAHA] No se pudieron leer los mensajes de ${chatId}:`, error.message)
+    return { ids: [], error: error.message || 'error desconocido' }
+  }
+}
+
+/**
  * Descargar media desde WAHA
  * @param {string} mediaUrl - URL del archivo en WAHA
  * @param {Object} options - Opciones de descarga
@@ -1131,6 +1167,7 @@ module.exports = {
   // Status & Utilities
   sendMarkReadWaha,
   checkNumberExistsWaha,
+  getChatMessageIdsWaha,     // Ids de mensajes de un chat (verificación lid ↔ teléfono)
   downloadMediaWaha,
   editMessageWaha,
   deleteMessageWaha,

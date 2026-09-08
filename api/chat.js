@@ -50,6 +50,13 @@ const resolveChatIdentity = async id => {
   return post(`/chats/${id}/resolve-identity`, {})
 }
 
+// Guarda a mano el teléfono de un chat identificado por @lid.
+// `numero` va SIN código de país; `mobileCode` lo aporta el selector de país.
+// `forzar` solo se manda tras un 409 SIN_VERIFICAR, cuando el agente confirma.
+const updateChatMobile = async (id, { mobileCode, numero, forzar = false }) => {
+  return post(`/chats/${id}/update-mobile`, { mobileCode, numero, forzar })
+}
+
 const moveChat = async (id, data) => {
   return put(`/chats/${id}/move`, data)
 }
@@ -60,6 +67,7 @@ const removeChat = async id => {
 
 module.exports = {
   resolveChatIdentity,
+  updateChatMobile,
   listChats,
   listChatsPipeline,
   countFilters,
