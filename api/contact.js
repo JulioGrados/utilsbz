@@ -20,11 +20,17 @@ const updateContact = async (id, data) => {
   return put(`/contact/${id}`, data)
 }
 
+// Pide al backend el teléfono real de un contacto guardado con un @lid.
+const resolveContactIdentity = async id => {
+  return post(`/contact/${id}/resolve-identity`, {})
+}
+
 const removeContact = async id => {
   return remove(`/contact/${id}`)
 }
 
 module.exports = {
+  resolveContactIdentity,
   listContacts,
   createContact,
   createOpenContacts,

@@ -44,6 +44,12 @@ const updateChat = async (id, data) => {
   return put(`/chats/${id}`, data)
 }
 
+// Pide al backend el teléfono real de un chat guardado con un @lid.
+// No recibe datos: el servidor resuelve la identidad contra WhatsApp.
+const resolveChatIdentity = async id => {
+  return post(`/chats/${id}/resolve-identity`, {})
+}
+
 const moveChat = async (id, data) => {
   return put(`/chats/${id}/move`, data)
 }
@@ -53,6 +59,7 @@ const removeChat = async id => {
 }
 
 module.exports = {
+  resolveChatIdentity,
   listChats,
   listChatsPipeline,
   countFilters,
