@@ -632,10 +632,26 @@ const getLidFromPhoneNumber = async (sessionName, phoneNumber) => {
  * Devuelve solo los dígitos del teléfono (ej: "51949002838") o null si no se pudo resolver.
  */
 const getPhoneNumberFromLid = async (sessionName, lid) => {
-  try {
-    const cleanLid = (lid || '').toString().replace('@lid', '').replace(/[^0-9]/g, '')
-    if (!cleanLid) return null
+  const { pn } = await getLidMapping(sessionName, lid)
+  return pn
+}
 
+/**
+ * Igual que `getPhoneNumberFromLid`, pero distingue los dos "no hay teléfono":
+ *
+ *   { pn: '51949002838', error: null }  → WAHA contestó y sí lo conoce
+ *   { pn: null, error: null }           → WAHA contestó: NO lo conoce
+ *   { pn: null, error: 'timeout…' }     → WAHA no contestó (red, caída, timeout)
+ *
+ * La diferencia importa: lo primero es una limitación de WhatsApp y no se puede
+ * hacer nada; lo último es un fallo pasajero que hay que poder reintentar y que
+ * no debe presentarse al agente como "WhatsApp no revela el número".
+ */
+const getLidMapping = async (sessionName, lid) => {
+  const cleanLid = (lid || '').toString().replace('@lid', '').replace(/[^0-9]/g, '')
+  if (!cleanLid) return { pn: null, error: 'lid vacío' }
+
+  try {
     const resp = await wahaClient.get(`/api/${sessionName}/lids/${cleanLid}`, {
       timeout: TIMEOUTS.default
     })
@@ -649,11 +665,11 @@ const getPhoneNumberFromLid = async (sessionName, lid) => {
     }
 
     const phone = pn ? pn.split('@')[0] : null
-    console.log(`📝 [WAHA] getPhoneNumberFromLid: ${cleanLid} -> ${phone}`)
-    return phone
+    console.log(`📝 [WAHA] getLidMapping: ${cleanLid} -> ${phone}`)
+    return { pn: phone, error: null }
   } catch (error) {
-    console.warn(`⚠️ [WAHA] No se pudo resolver el LID ${lid}:`, error.message)
-    return null
+    console.warn(`⚠️ [WAHA] No se pudo consultar el LID ${lid}:`, error.message)
+    return { pn: null, error: error.message || 'error desconocido' }
   }
 }
 
@@ -1121,6 +1137,7 @@ module.exports = {
   setReactionWaha,           // Reaccionar a un mensaje (emoji '' elimina la reacción)
   getLidFromPhoneNumber,     // Obtener LID desde número de teléfono
   getPhoneNumberFromLid,     // Resolver teléfono real desde un LID (entrantes @lid)
+  getLidMapping,             // Igual, distinguiendo "no lo conoce" de "no contestó"
   buildReplyToId,            // Construir reply_to ID para quoted
   getProfilePictureWaha      // Obtener foto de perfil de contacto
 }
