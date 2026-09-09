@@ -44,17 +44,13 @@ const updateChat = async (id, data) => {
   return put(`/chats/${id}`, data)
 }
 
-// Pide al backend el teléfono real de un chat guardado con un @lid.
-// No recibe datos: el servidor resuelve la identidad contra WhatsApp.
-const resolveChatIdentity = async id => {
-  return post(`/chats/${id}/resolve-identity`, {})
-}
-
 // Guarda a mano el teléfono de un chat identificado por @lid.
 // `numero` va SIN código de país; `mobileCode` lo aporta el selector de país.
-// `forzar` solo se manda tras un 409 SIN_VERIFICAR, cuando el agente confirma.
-const updateChatMobile = async (id, { mobileCode, numero, forzar = false }) => {
-  return post(`/chats/${id}/update-mobile`, { mobileCode, numero, forzar })
+// `forzar` y `fusionar` solo se mandan tras un 409, cuando el agente confirma:
+// `forzar` = guardar aunque WhatsApp no confirme que el número sea suyo;
+// `fusionar` = unir con el chat que ya tiene ese número, conservando este.
+const updateChatMobile = async (id, { mobileCode, numero, forzar = false, fusionar = false }) => {
+  return post(`/chats/${id}/update-mobile`, { mobileCode, numero, forzar, fusionar })
 }
 
 const moveChat = async (id, data) => {
@@ -66,7 +62,6 @@ const removeChat = async id => {
 }
 
 module.exports = {
-  resolveChatIdentity,
   updateChatMobile,
   listChats,
   listChatsPipeline,
