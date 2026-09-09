@@ -44,15 +44,6 @@ const updateChat = async (id, data) => {
   return put(`/chats/${id}`, data)
 }
 
-// Guarda a mano el teléfono de un chat identificado por @lid.
-// `numero` va SIN código de país; `mobileCode` lo aporta el selector de país.
-// `forzar` y `fusionar` solo se mandan tras un 409, cuando el agente confirma:
-// `forzar` = guardar aunque WhatsApp no confirme que el número sea suyo;
-// `fusionar` = unir con el chat que ya tiene ese número, conservando este.
-const updateChatMobile = async (id, { mobileCode, numero, forzar = false, fusionar = false }) => {
-  return post(`/chats/${id}/update-mobile`, { mobileCode, numero, forzar, fusionar })
-}
-
 const moveChat = async (id, data) => {
   return put(`/chats/${id}/move`, data)
 }
@@ -62,7 +53,6 @@ const removeChat = async id => {
 }
 
 module.exports = {
-  updateChatMobile,
   listChats,
   listChatsPipeline,
   countFilters,
