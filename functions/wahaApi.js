@@ -275,6 +275,7 @@ const checkSessionHealth = async (sessionName, forceCheck = false) => {
  * - session.status: Cambios de estado de sesión (WORKING, FAILED, etc.)
  * - presence.update: Actualizaciones de presencia (online, typing, etc.)
  * - poll.vote: Votos en encuestas
+ * - poll.vote.failed: Voto recibido que WAHA no pudo descifrar (sin opción)
  * - call.received: Llamadas recibidas
  * - call.accepted: Llamadas aceptadas
  * - call.rejected: Llamadas rechazadas
@@ -294,7 +295,8 @@ const WAHA_WEBHOOK_EVENTS = [
   'message.edited',    // Soporte para mensajes editados
   'session.status',
   'presence.update',
-  'poll.vote'
+  'poll.vote',
+  'poll.vote.failed'   // Voto que no se pudo descifrar (p. ej. tras reiniciar la sesión)
 ];
 
 /**
@@ -715,6 +717,34 @@ const buildReplyToId = (quotedMessageId, phoneNumber, lid = null) => {
   // Si no podemos procesar, devolver original
   console.log(`📝 [WAHA] buildReplyToId: usando original: ${quotedMessageId}`)
   return quotedMessageId
+}
+
+/**
+ * Enviar una encuesta (poll) de ELECCIÓN ÚNICA.
+ * WhatsApp ya no muestra botones a cuentas no oficiales: la encuesta es la forma
+ * soportada por WAHA de ofrecer opciones. El voto llega por el evento `poll.vote`.
+ * @param {string} sessionName
+ * @param {string} chatId - destino ya resuelto (`<telefono>@c.us` o `<lid>@lid`)
+ * @param {string} name - pregunta
+ * @param {string[]} options - opciones (2 a 12)
+ */
+const sendPollWaha = async (sessionName, chatId, name, options) => {
+  const formattedChatId = chatId.includes('@') ? chatId : `${chatId}@c.us`
+
+  return sendWithSessionCheck(sessionName, async () => {
+    const resp = await wahaClient.post('/api/sendPoll', {
+      session: sessionName,
+      chatId: formattedChatId,
+      poll: {
+        name,
+        options,
+        multipleAnswers: false
+      }
+    }, { timeout: TIMEOUTS.message })
+
+    console.log('✅ [WAHA] Encuesta enviada:', resp.data?.key?.id || resp.data?.id)
+    return resp
+  }, 'sendPoll')
 }
 
 /**
@@ -1163,6 +1193,7 @@ module.exports = {
   sendMessageDocumentWaha,
   sendMessageVoiceWaha,
   sendMessageMediaQuotedWaha,
+  sendPollWaha,                 // Encuesta de elección única
 
   // Status & Utilities
   sendMarkReadWaha,
