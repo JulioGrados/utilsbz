@@ -37,10 +37,6 @@ const createEnrolsMoodle = async data => {
   return post('/migrations/enrols', data)
 }
 
-const createOrUpdateUser = async data => {
-  return post('/open/users', data)
-}
-
 const createOrUpdateUserRegister = async data => {
   return post('/open/users/register', data)
 }
@@ -97,8 +93,10 @@ const removeUser = async id => {
   return remove(`/users/${id}`)
 }
 
-const recoverPassword = async data => {
-  return post(`/open/users/recover`, data)
+// Enlace de un solo uso (30 min) para que el usuario elija nueva contraseña.
+// Lo puede pedir el Admin de la empresa o el staff de Bizeus.
+const createResetLink = async id => {
+  return post(`/users/${id}/reset-link`, {})
 }
 
 module.exports = {
@@ -121,10 +119,9 @@ module.exports = {
   detailOpenTeacher,
   removeUser,
   listTeachers,
-  createOrUpdateUser,
   createOrUpdateUserRegister,
   addOrUpdateUser,
   countUsers,
-  recoverPassword,
+  createResetLink,
   createStudent
 }

@@ -8,7 +8,18 @@ const singup = (data) => {
   return post('/open/auth/singup', { ...data })
 }
 
+// Restablecer contraseña con el enlace que genera un admin (crmbz) o el staff (dashbz).
+const checkResetToken = token => {
+  return post('/open/auth/reset/check', { token })
+}
+
+const resetPassword = (token, password) => {
+  return post('/open/auth/reset', { token, password })
+}
+
 module.exports = {
   login,
-  singup
+  singup,
+  checkResetToken,
+  resetPassword
 }

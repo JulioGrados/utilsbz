@@ -7,6 +7,7 @@ const session = require('./functions/session')
 const reducers = require('./functions/reducers')
 const transform = require('./functions/transform')
 const user = require('./functions/user')
+const authValidation = require('./functions/authValidation')
 const wahaApi = require('./functions/wahaApi')
 const zadarma = require('./functions/zadarmaApi')
 
@@ -18,6 +19,7 @@ module.exports = {
   reducers,
   transform,
   user,
+  authValidation,
   // WAHA API
   ...wahaApi,
   // Zadarma (telefonía) — namespaced para evitar colisiones de nombres (callback/request)
